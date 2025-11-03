@@ -36,9 +36,9 @@ public class InnoAdApplication {
             ║              Backend API v2.0.0                       ║
             ║       Sistema de Publicidad con IA Integrada         ║
             ║                                                       ║
-            ║  🚀 La aplicación se ha iniciado correctamente       ║
-            ║  📚 Swagger UI: http://localhost:8080/swagger-ui.html║
-            ║  ❤️  Health: http://localhost:8080/actuator/health   ║
+            ║  Application started successfully                    ║
+            ║  Swagger UI: http://localhost:8080/swagger-ui.html   ║
+            ║  Health: http://localhost:8080/actuator/health       ║
             ║                                                       ║
             ╚═══════════════════════════════════════════════════════╝
             
