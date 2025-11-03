@@ -1,0 +1,13 @@
+target/
+.mvn/
+.git/
+.github/
+.idea/
+.vscode/
+logs/
+*.log
+node_modules/
+dist/
+*.iml
+*.zip
+*.tar.gz

@@ -1,0 +1,75 @@
+# Build / IDE
+/target/
+.mvn/
+.idea/
+.vscode/
+.classpath
+.project
+.settings/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs and runtime
+logs/
+*.log
+run-log.txt
+run-err.txt
+
+# Environment
+.env
+secrets.properties
+
+# Docker
+.dockerignore
+
+# Node / Frontend
+node_modules/
+dist/
+
+# Dependency Check reports
+target/dependency-check-report/
+target/dependency-check-data/
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### Logs ###
+logs/
+*.log
+
+### Environment ###
+.env
+.env.local
