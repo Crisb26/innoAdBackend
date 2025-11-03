@@ -1,6 +1,8 @@
 spring:
   application:
     name: innoad-backend
+  main:
+    web-application-type: servlet
   
   # ===== CONFIGURACION H2 DATABASE =====
   datasource:
@@ -112,8 +114,6 @@ innoad:
 # Configuración de servidor
 server:
   port: ${SERVER_PORT:8080}
-  servlet:
-    context-path: /api/v1
   error:
     include-message: always
     include-binding-errors: always

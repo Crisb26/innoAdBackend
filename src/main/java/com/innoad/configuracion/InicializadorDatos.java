@@ -6,7 +6,8 @@ import com.innoad.repositorio.RepositorioUsuario;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,16 +19,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  */
 @Component
 @RequiredArgsConstructor
-public class InicializadorDatos implements CommandLineRunner {
+public class InicializadorDatos {
 
     private static final Logger log = LoggerFactory.getLogger(InicializadorDatos.class);
 
     private final RepositorioUsuario repositorioUsuario;
     private final PasswordEncoder passwordEncoder;
 
-    @Override
+    @EventListener(ApplicationReadyEvent.class)
     @Transactional
-    public void run(String... args) {
+    public void inicializar() {
         long total = repositorioUsuario.count();
         if (total > 0) {
             log.info("InicializadorDatos: usuarios existentes detectados ({}). No se crean cuentas por defecto.", total);

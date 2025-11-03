@@ -23,38 +23,40 @@ public class StartupChecks implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         List<String> missing = new ArrayList<>();
-
-        // JWT secret (si no está, la aplicación funciona con fallback, pero en prod es obligatorio)
-        String jwt = env.getProperty("JWT_SECRET", env.getProperty("jwt.secret"));
-        if (jwt == null || jwt.isBlank()) {
-            missing.add("JWT_SECRET (jwt.secret)");
-        }
-
-        // Frontend URL (para CORS y redirecciones)
-        String frontend = env.getProperty("FRONTEND_URL", env.getProperty("innoad.frontend.url"));
-        if (frontend == null || frontend.isBlank()) {
-            missing.add("FRONTEND_URL (innoad.frontend.url)");
-        }
-
-        // Si perfil activo es 'prod', exigir DB y MAIL
         String[] profiles = env.getActiveProfiles();
+        boolean isProd = false;
+
         for (String p : profiles) {
             if ("prod".equalsIgnoreCase(p)) {
-                String db = env.getProperty("DB_URL");
-                if (db == null || db.isBlank()) missing.add("DB_URL");
-
-                String mailUser = env.getProperty("MAIL_USERNAME");
-                String mailPass = env.getProperty("MAIL_PASSWORD");
-                if (mailUser == null || mailUser.isBlank()) missing.add("MAIL_USERNAME");
-                if (mailPass == null || mailPass.isBlank()) missing.add("MAIL_PASSWORD");
+                isProd = true;
+                break;
             }
         }
 
-        if (!missing.isEmpty()) {
-            String msg = "Variables de entorno faltantes: " + String.join(", ", missing) + 
-                    ". Define estas variables antes de arrancar la aplicación (ver DEPLOYMENT.md).";
-            // Lanzar excepción para detener el inicio y mostrar el error claro
-            throw new RuntimeException(msg);
+        if (isProd) {
+            String jwt = env.getProperty("jwt.secret");
+            if (jwt == null || jwt.isBlank() || jwt.contains("MiClaveSecreta")) {
+                missing.add("jwt.secret (debe configurarse para producción)");
+            }
+
+            String db = env.getProperty("spring.datasource.url");
+            if (db == null || db.contains("h2:mem")) {
+                missing.add("spring.datasource.url (debe usar PostgreSQL en producción)");
+            }
+
+            String mailUser = env.getProperty("spring.mail.username");
+            String mailPass = env.getProperty("spring.mail.password");
+            if (mailUser == null || mailUser.isBlank() || mailUser.contains("tu-email")) {
+                missing.add("spring.mail.username");
+            }
+            if (mailPass == null || mailPass.isBlank() || mailPass.contains("tu-password")) {
+                missing.add("spring.mail.password");
+            }
+
+            if (!missing.isEmpty()) {
+                String msg = "Variables de configuración requeridas para producción: " + String.join(", ", missing);
+                throw new RuntimeException(msg);
+            }
         }
     }
 }

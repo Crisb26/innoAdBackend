@@ -1,26 +1,27 @@
 # InnoAd Backend
 
-## Descripción del Proyecto
-InnoAd Backend es un sistema de gestión de publicidad potenciado por Inteligencia Artificial, desarrollado con Spring Boot 3.5.0. Este sistema proporciona una API REST robusta para la gestión de publicidad, usuarios y conversaciones con IA, implementando características avanzadas de seguridad y rendimiento.
+## Descripcion del Proyecto
+Sistema de gestion de publicidad potenciado por Inteligencia Artificial, desarrollado con Spring Boot 3.5.0. Proporciona una API REST robusta para la gestion de publicidad, usuarios y conversaciones con IA, implementando caracteristicas avanzadas de seguridad y rendimiento.
 
-## Tecnologías Principales
+## Tecnologias Principales
 - Java 21 (LTS)
 - Spring Boot 3.5.0
 - Spring Security con JWT
 - Spring Data JPA
-- Redis para caché
-- H2 Database
-- Maven
+- H2 Database (desarrollo) / PostgreSQL (produccion)
+- Redis para cache
+- Maven 3.9+
 - Docker
-- Swagger/OpenAPI para documentación
+- Swagger/OpenAPI para documentacion
 
 ## Requisitos de Sistema
-### Requisitos Mínimos
+
+### Requisitos Minimos
 - JDK 21
 - Maven 3.9.x
-- Docker Desktop
+- Docker Desktop (opcional)
 - 4GB RAM
-- 2 núcleos de CPU
+- 2 nucleos de CPU
 - 10GB espacio en disco
 
 ### Software Requerido
@@ -28,238 +29,320 @@ InnoAd Backend es un sistema de gestión de publicidad potenciado por Inteligenc
    - Descargar de: https://adoptium.net/
    - Configurar JAVA_HOME
 
-2. **Docker Desktop**
+2. **Maven 3.9+**
+   - Incluido con el wrapper (mvnw)
+
+3. **Docker Desktop** (opcional para desarrollo, requerido para produccion)
    - Descargar de: https://www.docker.com/products/docker-desktop
-   - Necesario para la contenerización
 
-3. **IDE Recomendado: Visual Studio Code**
-   - Extensiones necesarias:
-     - Extension Pack for Java
-   # InnoAd Backend
+## Inicio Rapido
 
-   ## Descripción del Proyecto
-   InnoAd Backend es un sistema de gestión de publicidad potenciado por Inteligencia Artificial, desarrollado con Spring Boot 3.5.0. Este sistema proporciona una API REST robusta para la gestión de publicidad, usuarios y conversaciones con IA, implementando características avanzadas de seguridad y rendimiento.
+### Opcion 1: Ejecucion directa (Desarrollo)
 
-   ## Tecnologías Principales
-   - Java 21 (LTS)
-   - Spring Boot 3.5.0
-   - Spring Security con JWT
-   - Spring Data JPA
-   - Redis para caché
-   - H2 Database
-   - Maven
-   - Docker
-   - Swagger/OpenAPI para documentación
+```bash
+# Compilar el proyecto
+mvn clean package -DskipTests
 
-   ## Requisitos de Sistema
-   ### Requisitos Mínimos
-   - JDK 21
-   - Maven 3.9.x
-   - Docker Desktop
-   - 4GB RAM
-   - 2 núcleos de CPU
-   - 10GB espacio en disco
+# Ejecutar el backend
+java -jar target/innoad-backend-2.0.0.jar
+```
 
-   ### Software Requerido
-   1. **Java Development Kit (JDK) 21**
-      - Descargar de: https://adoptium.net/
-      - Configurar JAVA_HOME
+O usar el script proporcionado:
+```bash
+start-backend.bat
+```
 
-   2. **Docker Desktop**
-      - Descargar de: https://www.docker.com/products/docker-desktop
-      - Necesario para la contenerización
+El backend estara disponible en: http://localhost:8080
 
-   3. **IDE Recomendado: Visual Studio Code**
-      - Extensiones necesarias:
-        - Extension Pack for Java
-        - Spring Boot Extension Pack
-        - Lombok Annotations Support
-        - Docker
-        - GitLens
+### Opcion 2: Docker (Produccion)
 
-   ## Estructura del Proyecto
-   ```plaintext
-   innoadBackend/
-   ├── src/
-   │   ├── main/
-   │   │   ├── java/com/innoad/
-   │   │   │   ├── configuracion/    # Configuraciones de Spring
-   │   │   │   ├── controlador/      # Controladores REST
-   │   │   │   ├── dto/             # Objetos de transferencia de datos
-   │   │   │   ├── modelo/          # Entidades y modelos
-   │   │   │   ├── repositorio/     # Repositorios JPA
-   │   │   │   ├── servicio/        # Lógica de negocio
-   │   │   │   └── utilidad/        # Clases utilitarias
-   │   │   └── resources/
-   │   │       ├── application.yml   # Configuración principal
-   │   │       ├── application-dev.yml
-   │   │       └── application-prod.yml
-   │   └── test/                    # Pruebas unitarias e integración
-   ├── Dockerfile                   # Configuración de Docker
-   ├── pom.xml                     # Dependencias Maven
-   └── README.md                   # Documentación
-   ```
+```bash
+# Construir imagen
+docker build -t innoad-backend:latest .
 
-   ## Documentación de la API
+# Ejecutar contenedor
+docker run -d \
+  --name innoad-backend \
+  -p 8080:8080 \
+  -e SPRING_PROFILES_ACTIVE=prod \
+  innoad-backend:latest
+```
 
-   ### Acceso a la Documentación
-   La documentación completa de la API está disponible a través de Swagger UI:
-   ```
-   http://localhost:8080/api/v1/swagger-ui.html
-   ```
+### Opcion 3: Docker Compose (Recomendado)
 
-   ### Endpoints Principales
+```bash
+# Iniciar servicios
+docker-compose up -d
 
-   #### Autenticación y Usuarios
-   - `POST /api/autenticacion/registrar` - Registro de nuevos usuarios
-   - `POST /api/autenticacion/iniciar-sesion` - Inicio de sesión (contrato frontend)
-   - `POST /api/autenticacion/refrescar-token` - Renovar token JWT
-   - `POST /api/autenticacion/cerrar-sesion` - Cerrar sesión (stateless)
+# Ver logs
+docker-compose logs -f backend
 
-   #### Publicidad
-   - `GET /api/publicidad` - Listar publicidades
-   - `POST /api/publicidad` - Crear nueva publicidad
-   - `PUT /api/publicidad/{id}` - Actualizar publicidad
-   - `DELETE /api/publicidad/{id}` - Eliminar publicidad
+# Detener servicios
+docker-compose down
+```
 
-   #### Conversaciones IA
-   - `POST /api/ia/conversacion` - Iniciar conversación con IA
-   - `GET /api/ia/conversacion/{id}` - Obtener historial
-   - `POST /api/ia/mensaje` - Enviar mensaje a IA
+## Configuracion
 
-   ### Seguridad
-   - Autenticación mediante JWT
-   - Roles de usuario: ADMIN, ANUNCIANTE, CLIENTE
-   - Tokens de acceso y refresh
-   - Validación de sesiones
+### Variables de Entorno
 
-   ## Variables de Entorno Requeridas
+Copiar `.env.example` a `.env` y ajustar los valores:
 
-   ```properties
-   # Configuración JWT
-   JWT_SECRET=tu_clave_secreta_segura
-   JWT_EXPIRATION=3600000
-   JWT_REFRESH_EXPIRATION=86400000
+```properties
+# Configuracion del servidor
+SERVER_PORT=8080
+SPRING_PROFILES_ACTIVE=dev
 
-   # Perfil de Spring
-   SPRING_PROFILES_ACTIVE=dev
+# JWT
+JWT_SECRET=MiClaveSecretaSuperSeguraParaInnoAdQueDebeSerMuyLarga2024!
 
-   # Puerto de la aplicación
-   SERVER_PORT=8080
+# Base de datos (H2 para desarrollo, PostgreSQL para produccion)
+DB_URL=jdbc:h2:mem:innoad_db
+DB_USERNAME=sa
+DB_PASSWORD=
 
-   # Configuración Redis (opcional)
-   REDIS_HOST=localhost
-   REDIS_PORT=6379
-   ```
+# Correo electronico
+MAIL_USERNAME=tu-email@gmail.com
+MAIL_PASSWORD=tu-password-de-aplicacion
 
-   ## Construcción y Despliegue
+# Frontend URL
+FRONTEND_URL=http://localhost:8080
 
-   ### Construcción Local
-   ```bash
-   # Compilar el proyecto
-   ./mvnw clean install
+# Redis (opcional)
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=
 
-   # Ejecutar pruebas
-   ./mvnw test
+# IA API (opcional)
+AI_API_KEY=tu-api-key-aqui
+AI_MODEL=gpt-4
+```
 
-   # Ejecutar la aplicación
-   ./mvnw spring-boot:run
-   ```
+### Perfiles de Spring
 
-   ### Despliegue con Docker
-   ```bash
-   # Construir imagen
-   docker build -t innoad-backend .
+- `dev`: Desarrollo local (H2, logs verbosos)
+- `prod`: Produccion (PostgreSQL, seguridad reforzada)
 
-   # Ejecutar contenedor
-   docker run -d \
-     --name innoad-backend \
-     -p 8000:8000 \
-     -e SPRING_PROFILES_ACTIVE=prod \
-     innoad-backend
-   ```
+## Estructura del Proyecto
 
-   ## Pruebas y Calidad de Código
+```
+innoadBackend/
+├── src/
+│   ├── main/
+│   │   ├── java/com/innoad/
+│   │   │   ├── configuracion/    # Configuraciones de Spring
+│   │   │   ├── controlador/      # Controladores REST
+│   │   │   ├── dto/              # Objetos de transferencia de datos
+│   │   │   ├── filtro/           # Filtros de seguridad
+│   │   │   ├── modelo/           # Entidades JPA
+│   │   │   ├── repositorio/      # Repositorios JPA
+│   │   │   ├── servicio/         # Logica de negocio
+│   │   │   └── utilidad/         # Clases utilitarias
+│   │   └── resources/
+│   │       └── application.yml   # Configuracion principal
+│   └── test/                     # Pruebas unitarias e integracion
+├── Dockerfile                    # Configuracion de Docker
+├── docker-compose.yml            # Orquestacion de servicios
+├── pom.xml                       # Dependencias Maven
+└── README.md                     # Documentacion
+```
 
-   ### Ejecutar Pruebas
-   ```bash
-   # Pruebas unitarias
-   ./mvnw test
+## Documentacion de la API
 
-   # Pruebas de integración
-   ./mvnw verify
-   ```
+### Acceso a Swagger UI
+Documentacion interactiva disponible en:
+```
+http://localhost:8080/swagger-ui.html
+```
 
-   ### Análisis de Código
-   El proyecto utiliza:
-   - Pruebas unitarias con JUnit 5
-   - Integración continua
-   - Cobertura de código
-   - Validaciones de seguridad
+### Endpoints Principales
 
-   ## Contribución al Proyecto
+#### Autenticacion (Publicos)
+- `POST /api/v1/autenticacion/iniciar-sesion` - Login
+- `POST /api/v1/autenticacion/refrescar-token` - Renovar token JWT
+- `POST /api/v1/autenticacion/cerrar-sesion` - Logout
+- `POST /api/v1/autenticacion/registrar` - Registro de usuarios
 
-   1. Crear una rama para cada característica:
-   ```bash
-   git checkout -b feature/nombre-caracteristica
-   ```
+#### Health Check
+- `GET /actuator/health` - Estado del servicio
 
-   2. Seguir las convenciones de código:
-      - Usar CamelCase para nombres de clases y métodos
-      - Documentar métodos públicos
-      - Mantener clases enfocadas y cohesivas
-      - Escribir pruebas unitarias
+#### Otros Endpoints (Requieren autenticacion)
+- Publicidad: `/api/v1/publicidad/**`
+- Conversaciones IA: `/api/v1/ia/**`
+- Administracion: `/api/v1/admin/**`
 
-   3. Proceso de envío de cambios:
-   ```bash
-   git add .
-   git commit -m "descripción detallada del cambio"
-   git push origin feature/nombre-caracteristica
-   ```
+### Seguridad
+- Autenticacion mediante JWT
+- Tokens Bearer en header `Authorization`
+- Roles: ADMINISTRADOR, TECNICO, DESARROLLADOR, USUARIO
+- Refresh tokens para renovacion automatica
 
-   4. Crear Pull Request con:
-      - Descripción clara de los cambios
-      - Referencias a issues relacionados
-      - Pruebas realizadas
+## Usuarios Precargados
 
-   ## Solución de Problemas Comunes
+Al iniciar por primera vez, se crean automaticamente estas cuentas:
 
-   1. **Error de conexión a Redis**
-      - Verificar que Redis está ejecutándose
-      - Comprobar configuración en application.yml
+| Usuario | Contrasena | Rol |
+|---------|-----------|-----|
+| admin | Admin123! | ADMINISTRADOR |
+| tecnico | Tecnico123! | TECNICO |
+| dev | Dev123! | DESARROLLADOR |
+| usuario | Usuario123! | USUARIO |
 
-   2. **Problemas con JWT**
-      - Validar SECRET_KEY configurada
-      - Verificar tiempo de expiración del token
+## Integracion con Frontend
 
-   3. **Errores de compilación**
-      - Actualizar dependencias Maven
-      - Limpiar caché de Maven:
-        ```bash
-        ./mvnw clean
-        ```
+El backend esta configurado para integrarse con el frontend Angular en:
+- **Desarrollo**: http://localhost:4200
+- **Produccion**: http://localhost:8080
 
-   ## Mantenimiento
+### Contrato de API
 
-   - Actualizar dependencias regularmente
-   - Monitorear logs de la aplicación
-   - Realizar copias de seguridad de la base de datos
-   - Revisar y actualizar documentación
+Todas las respuestas siguen el formato `RespuestaAPI<T>`:
 
-   ## Contacto y Soporte
+```json
+{
+  "exitoso": true,
+  "mensaje": "Operacion exitosa",
+  "datos": { ... },
+  "timestamp": "2025-11-03T...",
+  "errores": []
+}
+```
 
-   Para reportar problemas o sugerir mejoras:
-   1. Crear un issue en GitHub
-   2. Proporcionar detalles completos del problema
-   3. Incluir logs relevantes
+### Ejemplo de Login
 
-## Usuarios precargados para pruebas
+```bash
+curl -X POST http://localhost:8080/api/v1/autenticacion/iniciar-sesion \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nombreUsuarioOEmail": "admin",
+    "contrasena": "Admin123!"
+  }'
+```
 
-Al iniciar por primera vez, si no hay usuarios en la base de datos, se crean automáticamente las siguientes cuentas para facilitar pruebas locales:
+Respuesta:
+```json
+{
+  "exitoso": true,
+  "mensaje": "Autenticacion exitosa",
+  "datos": {
+    "token": "eyJhbGc...",
+    "tokenActualizacion": "eyJhbGc...",
+    "expiraEn": 86400,
+    "usuario": {
+      "id": 1,
+      "nombreUsuario": "admin",
+      "email": "admin@innoad.com",
+      "rol": { "nombre": "Administrador" },
+      "permisos": [...]
+    }
+  }
+}
+```
 
-- admin / Admin123! (rol: ADMINISTRADOR)
-- tecnico / Tecnico123! (rol: TECNICO)
-- dev / Dev123! (rol: DESARROLLADOR)
-- usuario / Usuario123! (rol: USUARIO)
+## Desarrollo
 
-Endpoint de login (frontend): `POST /api/autenticacion/iniciar-sesion`
+### Ejecutar en modo desarrollo
+
+```bash
+# Con Maven
+mvn spring-boot:run
+
+# O con el JAR compilado
+java -jar target/innoad-backend-2.0.0.jar
+```
+
+### Ejecutar pruebas
+
+```bash
+# Pruebas unitarias
+mvn test
+
+# Pruebas de integracion
+mvn verify
+
+# Todas las pruebas con cobertura
+mvn clean test jacoco:report
+```
+
+### Acceso a H2 Console (solo desarrollo)
+
+URL: http://localhost:8080/h2-console
+
+- JDBC URL: `jdbc:h2:mem:innoad_db`
+- Usuario: `sa`
+- Contrasena: (vacio)
+
+## Despliegue en Produccion
+
+### Prerequisitos
+1. Configurar variables de entorno de produccion
+2. Usar perfil `prod`: `-Dspring.profiles.active=prod`
+3. Configurar PostgreSQL (no usar H2)
+4. Configurar servidor SMTP real
+5. Usar secreto JWT seguro (no el de ejemplo)
+
+### Docker en Produccion
+
+```bash
+# Build
+docker build -t innoad-backend:latest .
+
+# Run con variables de entorno
+docker run -d \
+  --name innoad-backend \
+  -p 8080:8080 \
+  -e SPRING_PROFILES_ACTIVE=prod \
+  -e JWT_SECRET="tu-secreto-muy-seguro" \
+  -e DB_URL="jdbc:postgresql://db:5432/innoad" \
+  -e DB_USERNAME="innoad_user" \
+  -e DB_PASSWORD="password-seguro" \
+  -e MAIL_USERNAME="noreply@tudominio.com" \
+  -e MAIL_PASSWORD="password-smtp" \
+  innoad-backend:latest
+```
+
+## Solucion de Problemas
+
+### El backend se cierra inmediatamente
+- Verificar que no estas usando perfil `prod` sin configurar las variables requeridas
+- El `StartupChecks` valida configuracion obligatoria en produccion
+
+### Error de conexion CORS
+- Verificar que el frontend este en los origenes permitidos (application.yml)
+- Asegurar que CORS esta habilitado en ConfiguracionSeguridad
+
+### Problemas con JWT
+- Verificar que `jwt.secret` esta configurado
+- Token debe enviarse como: `Authorization: Bearer <token>`
+
+### Error de compilacion
+```bash
+# Limpiar cache de Maven
+mvn clean
+
+# Reinstalar dependencias
+mvn clean install -U
+```
+
+## Monitoreo
+
+### Actuator Endpoints
+- Health: `/actuator/health`
+- Metrics: `/actuator/metrics`
+- Info: `/actuator/info`
+
+### Logs
+Los logs se almacenan en: `logs/innoad-backend.log`
+
+Nivel de logs configurable en application.yml
+
+## Contribucion
+
+Ver archivo `CONTRIBUTING.md` para guias de contribucion.
+
+## Licencia
+
+Proyecto academico - InnoAd Team 2025
+
+## Contacto
+
+Para reportar problemas o sugerir mejoras, crear un issue en el repositorio.

@@ -11,3 +11,9 @@ dist/
 *.iml
 *.zip
 *.tar.gz
+.env
+.env.local
+*.md
+*.bat
+.DS_Store
+Thumbs.db

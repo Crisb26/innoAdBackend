@@ -108,10 +108,14 @@
             <optional>true</optional>
         </dependency>
         
-        <!-- Cliente HTTP para llamadas a APIs externas (IA) -->
+        <!-- Cliente HTTP para llamadas a APIs externas (IA) - Solo WebClient sin el starter completo -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webflux</artifactId>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webflux</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.projectreactor.netty</groupId>
+            <artifactId>reactor-netty-http</artifactId>
         </dependency>
         
         <!-- OpenAPI/Swagger para documentación -->

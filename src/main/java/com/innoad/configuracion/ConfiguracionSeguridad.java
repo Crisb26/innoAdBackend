@@ -50,10 +50,12 @@ public class ConfiguracionSeguridad {
                         // Endpoints públicos
                         .requestMatchers(
                                 "/api/autenticacion/**",
+                                "/api/v1/autenticacion/**",
                                 "/api/mantenimiento/estado",
                                 "/swagger-ui/**",
                                 "/api-docs/**",
                                 "/actuator/health",
+                                "/h2-console/**",
                                 "/error"
                         ).permitAll()
                         

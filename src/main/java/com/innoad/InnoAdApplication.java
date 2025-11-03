@@ -22,26 +22,5 @@ public class InnoAdApplication {
     
     public static void main(String[] args) {
         SpringApplication.run(InnoAdApplication.class, args);
-        System.out.println("""
-            
-            ╔═══════════════════════════════════════════════════════╗
-            ║                                                       ║
-            ║     ██╗███╗   ██╗███╗   ██╗ ██████╗  █████╗ ██████╗  ║
-            ║     ██║████╗  ██║████╗  ██║██╔═══██╗██╔══██╗██╔══██╗ ║
-            ║     ██║██╔██╗ ██║██╔██╗ ██║██║   ██║███████║██║  ██║ ║
-            ║     ██║██║╚██╗██║██║╚██╗██║██║   ██║██╔══██║██║  ██║ ║
-            ║     ██║██║ ╚████║██║ ╚████║╚██████╔╝██║  ██║██████╔╝ ║
-            ║     ╚═╝╚═╝  ╚═══╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝  ╚═╝╚═════╝  ║
-            ║                                                       ║
-            ║              Backend API v2.0.0                       ║
-            ║       Sistema de Publicidad con IA Integrada         ║
-            ║                                                       ║
-            ║  Application started successfully                    ║
-            ║  Swagger UI: http://localhost:8080/swagger-ui.html   ║
-            ║  Health: http://localhost:8080/actuator/health       ║
-            ║                                                       ║
-            ╚═══════════════════════════════════════════════════════╝
-            
-            """);
     }
 }

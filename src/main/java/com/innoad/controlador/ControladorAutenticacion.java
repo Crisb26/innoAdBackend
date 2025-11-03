@@ -19,9 +19,9 @@ import java.util.Map;
  * Maneja registro, login, verificación y recuperación de contraseña.
  */
 @RestController
-@RequestMapping("/api/autenticacion")
+@RequestMapping("/api/v1/autenticacion")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:4200", "https://innoad.com"})
+@CrossOrigin(origins = {"http://localhost:4200", "http://localhost:8080", "https://innoad.com"})
 public class ControladorAutenticacion {
     
     private final ServicioAutenticacion servicioAutenticacion;

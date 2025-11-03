@@ -21,8 +21,8 @@ RUN apt-get update \
 
 WORKDIR /app
 
-# Expose configured application port (default 8000 in this repo)
-EXPOSE 8000
+# Expose configured application port (now 8080)
+EXPOSE 8080
 
 # Copy jar from builder stage
 COPY --from=build /workspace/target/innoad-backend-2.0.0.jar /app/innoad-backend.jar
@@ -33,4 +33,4 @@ ENTRYPOINT ["sh","-c","java $JAVA_OPTS -jar /app/innoad-backend.jar"]
 
 # Simple healthcheck using actuator endpoint
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD curl -f http://localhost:8000/actuator/health || exit 1
+  CMD curl -f http://localhost:8080/actuator/health || exit 1
