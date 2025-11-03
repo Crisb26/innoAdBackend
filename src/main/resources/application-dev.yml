@@ -1,0 +1,11 @@
+# Configuración para entorno de desarrollo
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/innoad_dev
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+logging:
+  level:
+    root: DEBUG
