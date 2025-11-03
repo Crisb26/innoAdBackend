@@ -105,15 +105,16 @@ InnoAd Backend es un sistema de gestión de publicidad potenciado por Inteligenc
    ### Acceso a la Documentación
    La documentación completa de la API está disponible a través de Swagger UI:
    ```
-   http://localhost:8000/swagger-ui.html
+   http://localhost:8080/api/v1/swagger-ui.html
    ```
 
    ### Endpoints Principales
 
    #### Autenticación y Usuarios
-   - `POST /api/auth/registro` - Registro de nuevos usuarios
-   - `POST /api/auth/login` - Inicio de sesión
-   - `POST /api/auth/refresh-token` - Renovar token JWT
+   - `POST /api/autenticacion/registrar` - Registro de nuevos usuarios
+   - `POST /api/autenticacion/iniciar-sesion` - Inicio de sesión (contrato frontend)
+   - `POST /api/autenticacion/refrescar-token` - Renovar token JWT
+   - `POST /api/autenticacion/cerrar-sesion` - Cerrar sesión (stateless)
 
    #### Publicidad
    - `GET /api/publicidad` - Listar publicidades
@@ -144,7 +145,7 @@ InnoAd Backend es un sistema de gestión de publicidad potenciado por Inteligenc
    SPRING_PROFILES_ACTIVE=dev
 
    # Puerto de la aplicación
-   SERVER_PORT=8000
+   SERVER_PORT=8080
 
    # Configuración Redis (opcional)
    REDIS_HOST=localhost
@@ -251,3 +252,14 @@ InnoAd Backend es un sistema de gestión de publicidad potenciado por Inteligenc
    1. Crear un issue en GitHub
    2. Proporcionar detalles completos del problema
    3. Incluir logs relevantes
+
+## Usuarios precargados para pruebas
+
+Al iniciar por primera vez, si no hay usuarios en la base de datos, se crean automáticamente las siguientes cuentas para facilitar pruebas locales:
+
+- admin / Admin123! (rol: ADMINISTRADOR)
+- tecnico / Tecnico123! (rol: TECNICO)
+- dev / Dev123! (rol: DESARROLLADOR)
+- usuario / Usuario123! (rol: USUARIO)
+
+Endpoint de login (frontend): `POST /api/autenticacion/iniciar-sesion`

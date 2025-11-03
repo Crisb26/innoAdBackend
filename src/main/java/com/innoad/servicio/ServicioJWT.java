@@ -2,7 +2,6 @@ package com.innoad.servicio;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
@@ -11,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -77,14 +75,14 @@ public class ServicioJWT {
             UserDetails userDetails,
             long expiration
     ) {
-        return Jwts
-                .builder()
-                .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-                .compact();
+    return Jwts
+        .builder()
+        .claims(extraClaims)
+        .subject(userDetails.getUsername())
+        .issuedAt(new Date(System.currentTimeMillis()))
+        .expiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(getSignInKey(), Jwts.SIG.HS256)
+        .compact();
     }
     
     /**
@@ -113,9 +111,9 @@ public class ServicioJWT {
      * Extrae todos los claims del token
      */
     private Claims extraerTodosLosClaims(String token) {
-        return Jwts
-                .parser()
-                .verifyWith((javax.crypto.SecretKey) getSignInKey())
+    return Jwts
+        .parser()
+        .verifyWith((SecretKey) getSignInKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
@@ -124,7 +122,7 @@ public class ServicioJWT {
     /**
      * Obtiene la clave de firma
      */
-    private Key getSignInKey() {
+    private SecretKey getSignInKey() {
         try {
             // Intentar decodificar como Base64 (configuración recomendada)
             byte[] keyBytes = Decoders.BASE64.decode(secretKey);

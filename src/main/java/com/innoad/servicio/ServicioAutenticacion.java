@@ -3,6 +3,8 @@ package com.innoad.servicio;
 import com.innoad.dto.solicitud.SolicitudLogin;
 import com.innoad.dto.solicitud.SolicitudRegistro;
 import com.innoad.dto.respuesta.RespuestaAutenticacion;
+import com.innoad.dto.respuesta.RespuestaAPI;
+import com.innoad.dto.respuesta.RespuestaLogin;
 import com.innoad.modelo.entidades.Usuario;
 import com.innoad.modelo.enumeraciones.RolUsuario;
 import com.innoad.repositorio.RepositorioUsuario;
@@ -32,6 +34,9 @@ public class ServicioAutenticacion {
     
     @Value("${innoad.max-users}")
     private Integer maxUsuarios;
+    
+    @Value("${jwt.expiration}")
+    private long jwtExpirationMillis;
     
     /**
      * Registra un nuevo usuario en el sistema
@@ -211,5 +216,118 @@ public class ServicioAutenticacion {
         usuario.setTokenRecuperacion(null);
         usuario.setTokenRecuperacionExpiracion(null);
         repositorioUsuario.save(usuario);
+    }
+
+    /**
+     * Autentica un usuario y devuelve el contrato esperado por el frontend
+     */
+    @Transactional
+    public RespuestaAPI<RespuestaLogin> autenticarV1(SolicitudLogin solicitud) {
+        // Reutilizar lógica existente
+        Usuario usuario = repositorioUsuario.findByNombreUsuario(solicitud.getNombreUsuarioOEmail())
+                .or(() -> repositorioUsuario.findByEmail(solicitud.getNombreUsuarioOEmail()))
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        if (!usuario.isAccountNonLocked()) {
+            throw new RuntimeException("Cuenta bloqueada por múltiples intentos fallidos. Intenta más tarde.");
+        }
+
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            usuario.getNombreUsuario(),
+                            solicitud.getContrasena()
+                    )
+            );
+            usuario.setIntentosFallidos(0);
+            usuario.setFechaBloqueo(null);
+            usuario.setUltimoAcceso(LocalDateTime.now());
+            repositorioUsuario.save(usuario);
+        } catch (Exception e) {
+            usuario.setIntentosFallidos(usuario.getIntentosFallidos() + 1);
+            if (usuario.getIntentosFallidos() >= 5) {
+                usuario.setFechaBloqueo(LocalDateTime.now());
+            }
+            repositorioUsuario.save(usuario);
+            throw new RuntimeException("Credenciales inválidas");
+        }
+
+        var accessToken = servicioJWT.generarToken(usuario);
+        var refreshToken = servicioJWT.generarTokenRefresh(usuario);
+
+        var rolNombre = switch (usuario.getRol()) {
+            case ADMINISTRADOR -> "Administrador";
+            case TECNICO -> "Técnico";
+            case DESARROLLADOR -> "Desarrollador";
+            case USUARIO -> "Usuario";
+            case VISITANTE -> "Visitante";
+        };
+
+        var usuarioLogin = RespuestaLogin.UsuarioLogin.builder()
+                .id(usuario.getId())
+                .nombreUsuario(usuario.getNombreUsuario())
+                .email(usuario.getEmail())
+                .nombreCompleto(usuario.getNombreCompleto())
+                .rol(RespuestaLogin.RolSimple.builder().nombre(rolNombre).build())
+                .build();
+
+        var respuestaLogin = RespuestaLogin.builder()
+                .token(accessToken)
+                .tokenActualizacion(refreshToken)
+                .usuario(usuarioLogin)
+                .expiraEn(jwtExpirationMillis / 1000)
+                .build();
+
+        return RespuestaAPI.<RespuestaLogin>builder()
+                .exitoso(true)
+                .mensaje("Autenticación exitosa")
+                .datos(respuestaLogin)
+                .build();
+    }
+
+    /**
+     * Refresca el token de acceso usando un refresh token válido
+     */
+    @Transactional(readOnly = true)
+    public RespuestaAPI<RespuestaLogin> refrescarToken(String refreshToken) {
+        String username = servicioJWT.extraerNombreUsuario(refreshToken);
+        Usuario usuario = repositorioUsuario.findByNombreUsuario(username)
+                .or(() -> repositorioUsuario.findByEmail(username))
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        if (!servicioJWT.esTokenValido(refreshToken, usuario)) {
+            throw new RuntimeException("Refresh token inválido o expirado");
+        }
+
+        var nuevoAccessToken = servicioJWT.generarToken(usuario);
+
+        var rolNombre = switch (usuario.getRol()) {
+            case ADMINISTRADOR -> "Administrador";
+            case TECNICO -> "Técnico";
+            case DESARROLLADOR -> "Desarrollador";
+            case USUARIO -> "Usuario";
+            case VISITANTE -> "Visitante";
+        };
+
+        var usuarioLogin = RespuestaLogin.UsuarioLogin.builder()
+                .id(usuario.getId())
+                .nombreUsuario(usuario.getNombreUsuario())
+                .email(usuario.getEmail())
+                .nombreCompleto(usuario.getNombreCompleto())
+                .rol(RespuestaLogin.RolSimple.builder().nombre(rolNombre).build())
+                .build();
+
+        var respuestaLogin = RespuestaLogin.builder()
+                .token(nuevoAccessToken)
+                .tokenActualizacion(refreshToken)
+                .usuario(usuarioLogin)
+                .expiraEn(jwtExpirationMillis / 1000)
+                .build();
+
+        return RespuestaAPI.<RespuestaLogin>builder()
+                .exitoso(true)
+                .mensaje("Token renovado")
+                .datos(respuestaLogin)
+                .build();
     }
 }

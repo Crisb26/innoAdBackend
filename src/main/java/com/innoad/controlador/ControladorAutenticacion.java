@@ -3,6 +3,9 @@ package com.innoad.controlador;
 import com.innoad.dto.solicitud.SolicitudLogin;
 import com.innoad.dto.solicitud.SolicitudRegistro;
 import com.innoad.dto.respuesta.RespuestaAutenticacion;
+import com.innoad.dto.respuesta.RespuestaAPI;
+import com.innoad.dto.respuesta.RespuestaLogin;
+import com.innoad.dto.solicitud.SolicitudRefreshToken;
 import com.innoad.servicio.ServicioAutenticacion;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -127,4 +130,59 @@ public class ControladorAutenticacion {
                     ));
         }
     }
+
+        // ===== Endpoints v1 para Frontend =====
+
+        /**
+         * Iniciar sesión (contrato esperado por frontend)
+         */
+        @PostMapping("/iniciar-sesion")
+        public ResponseEntity<RespuestaAPI<RespuestaLogin>> iniciarSesion(
+                        @Valid @RequestBody SolicitudLogin solicitud
+        ) {
+                try {
+                        var respuesta = servicioAutenticacion.autenticarV1(solicitud);
+                        return ResponseEntity.ok(respuesta);
+                } catch (Exception e) {
+                        return ResponseEntity.badRequest().body(
+                                        RespuestaAPI.<RespuestaLogin>builder()
+                                                        .exitoso(false)
+                                                        .mensaje("Error al autenticar: " + e.getMessage())
+                                                        .build()
+                        );
+                }
+        }
+
+        /**
+         * Refrescar token de acceso
+         */
+        @PostMapping("/refrescar-token")
+        public ResponseEntity<RespuestaAPI<RespuestaLogin>> refrescarToken(
+                        @Valid @RequestBody SolicitudRefreshToken solicitud
+        ) {
+                try {
+                        var respuesta = servicioAutenticacion.refrescarToken(solicitud.getTokenActualizacion());
+                        return ResponseEntity.ok(respuesta);
+                } catch (Exception e) {
+                        return ResponseEntity.badRequest().body(
+                                        RespuestaAPI.<RespuestaLogin>builder()
+                                                        .exitoso(false)
+                                                        .mensaje("Error al refrescar token: " + e.getMessage())
+                                                        .build()
+                        );
+                }
+        }
+
+        /**
+         * Cerrar sesión (stateless: es un no-op, el frontend simplemente olvida tokens)
+         */
+        @PostMapping("/cerrar-sesion")
+        public ResponseEntity<RespuestaAPI<Void>> cerrarSesion() {
+                return ResponseEntity.ok(
+                                RespuestaAPI.<Void>builder()
+                                                .exitoso(true)
+                                                .mensaje("Sesión cerrada")
+                                                .build()
+                );
+        }
 }
