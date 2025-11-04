@@ -73,3 +73,4 @@ logs/
 ### Environment ###
 .env
 .env.local
+nul  
