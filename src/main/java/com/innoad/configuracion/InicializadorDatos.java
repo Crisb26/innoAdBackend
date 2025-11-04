@@ -48,7 +48,7 @@ public class InicializadorDatos {
         );
 
         crearSiNoExiste(
-                "dev", "dev@innoad.com", "Dev123!", "Devel", "Oper",
+                "developer", "dev@innoad.com", "Dev123!", "Devel", "Oper",
                 RolUsuario.DESARROLLADOR
         );
 

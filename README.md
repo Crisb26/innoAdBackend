@@ -28,7 +28,7 @@ El backend se ejecutara en: **http://localhost:8081**
 |---------|----------|-----|
 | admin | Admin123! | ADMINISTRADOR |
 | tecnico | Tecnico123! | TECNICO |
-| dev | Dev123! | DESARROLLADOR |
+| developer | Dev123! | DESARROLLADOR |
 | usuario | Usuario123! | USUARIO |
 
 ### Ejemplo de Login
