@@ -14,21 +14,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-/**
- * Controlador REST para la autenticación de usuarios.
- * Maneja registro, login, verificación y recuperación de contraseña.
- */
 @RestController
 @RequestMapping("/api/v1/autenticacion")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:4200", "http://localhost:8080", "https://innoad.com"})
+@CrossOrigin(origins = {"http://localhost:4200", "http://localhost:8080", "http://127.0.0.1:8080"})
 public class ControladorAutenticacion {
     
     private final ServicioAutenticacion servicioAutenticacion;
     
-    /**
-     * Endpoint para registrar un nuevo usuario
-     */
     @PostMapping("/registrar")
     public ResponseEntity<RespuestaAutenticacion> registrar(
             @Valid @RequestBody SolicitudRegistro solicitud
@@ -44,9 +37,6 @@ public class ControladorAutenticacion {
         }
     }
     
-    /**
-     * Endpoint para iniciar sesión
-     */
     @PostMapping("/login")
     public ResponseEntity<RespuestaAutenticacion> login(
             @Valid @RequestBody SolicitudLogin solicitud
@@ -62,9 +52,6 @@ public class ControladorAutenticacion {
         }
     }
     
-    /**
-     * Endpoint para verificar el email del usuario
-     */
     @GetMapping("/verificar-email")
     public ResponseEntity<Map<String, String>> verificarEmail(
             @RequestParam String token
@@ -84,9 +71,6 @@ public class ControladorAutenticacion {
         }
     }
     
-    /**
-     * Endpoint para solicitar recuperación de contraseña
-     */
     @PostMapping("/recuperar-contrasena")
     public ResponseEntity<Map<String, String>> recuperarContrasena(
             @RequestBody Map<String, String> solicitud
@@ -106,9 +90,6 @@ public class ControladorAutenticacion {
         }
     }
     
-    /**
-     * Endpoint para restablecer la contraseña
-     */
     @PostMapping("/restablecer-contrasena")
     public ResponseEntity<Map<String, String>> restablecerContrasena(
             @RequestBody Map<String, String> solicitud
@@ -131,12 +112,7 @@ public class ControladorAutenticacion {
         }
     }
 
-        // ===== Endpoints v1 para Frontend =====
-
-        /**
-         * Iniciar sesión (contrato esperado por frontend)
-         */
-        @PostMapping("/iniciar-sesion")
+    @PostMapping("/iniciar-sesion")
         public ResponseEntity<RespuestaAPI<RespuestaLogin>> iniciarSesion(
                         @Valid @RequestBody SolicitudLogin solicitud
         ) {
@@ -153,10 +129,7 @@ public class ControladorAutenticacion {
                 }
         }
 
-        /**
-         * Refrescar token de acceso
-         */
-        @PostMapping("/refrescar-token")
+    @PostMapping("/refrescar-token")
         public ResponseEntity<RespuestaAPI<RespuestaLogin>> refrescarToken(
                         @Valid @RequestBody SolicitudRefreshToken solicitud
         ) {
@@ -173,10 +146,7 @@ public class ControladorAutenticacion {
                 }
         }
 
-        /**
-         * Cerrar sesión (stateless: es un no-op, el frontend simplemente olvida tokens)
-         */
-        @PostMapping("/cerrar-sesion")
+    @PostMapping("/cerrar-sesion")
         public ResponseEntity<RespuestaAPI<Void>> cerrarSesion() {
                 return ResponseEntity.ok(
                                 RespuestaAPI.<Void>builder()

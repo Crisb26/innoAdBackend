@@ -25,10 +25,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Configuración de seguridad para la aplicación InnoAd.
- * Implementa autenticación JWT y control de acceso por roles.
- */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -38,9 +34,6 @@ public class ConfiguracionSeguridad {
     private final FiltroAutenticacionJWT filtroJwt;
     private final UserDetailsService userDetailsService;
     
-    /**
-     * Configuración de la cadena de filtros de seguridad
-     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -79,9 +72,6 @@ public class ConfiguracionSeguridad {
         return http.build();
     }
     
-    /**
-     * Configuración del proveedor de autenticación
-     */
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -90,25 +80,16 @@ public class ConfiguracionSeguridad {
         return authProvider;
     }
     
-    /**
-     * Configuración del gestor de autenticación
-     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
     
-    /**
-     * Configuración del codificador de contraseñas
-     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
     
-    /**
-     * Configuración de CORS
-     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
