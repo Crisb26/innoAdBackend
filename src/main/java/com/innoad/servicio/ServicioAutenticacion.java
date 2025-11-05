@@ -2,6 +2,7 @@ package com.innoad.servicio;
 
 import com.innoad.dto.solicitud.SolicitudLogin;
 import com.innoad.dto.solicitud.SolicitudRegistro;
+import com.innoad.dto.solicitud.SolicitudRegistroPublico;
 import com.innoad.dto.respuesta.RespuestaAutenticacion;
 import com.innoad.dto.respuesta.RespuestaAPI;
 import com.innoad.dto.respuesta.RespuestaLogin;
@@ -106,6 +107,75 @@ public class ServicioAutenticacion {
                 .build();
     }
     
+    /**
+     * Registra un nuevo usuario desde el formulario público
+     * Solo permite crear usuarios con rol USUARIO
+     */
+    @Transactional
+    public RespuestaAutenticacion registrarPublico(SolicitudRegistroPublico solicitud) {
+        // Verificar límite de usuarios
+        Long usuariosActivos = repositorioUsuario.contarUsuariosActivos();
+        if (usuariosActivos >= maxUsuarios) {
+            throw new RuntimeException("Se ha alcanzado el límite máximo de usuarios del sistema");
+        }
+
+        // Verificar si el usuario ya existe
+        if (repositorioUsuario.existsByNombreUsuario(solicitud.getNombreUsuario())) {
+            throw new RuntimeException("El nombre de usuario ya está en uso");
+        }
+
+        if (repositorioUsuario.existsByEmail(solicitud.getEmail())) {
+            throw new RuntimeException("El email ya está registrado");
+        }
+
+        // Crear el usuario con rol USUARIO forzado
+        var usuario = Usuario.builder()
+                .nombre(solicitud.getNombre())
+                .apellido(solicitud.getApellido())
+                .email(solicitud.getEmail())
+                .nombreUsuario(solicitud.getNombreUsuario())
+                .contrasena(passwordEncoder.encode(solicitud.getContrasena()))
+                .rol(RolUsuario.USUARIO) // Siempre USUARIO en registro público
+                .telefono(solicitud.getTelefono())
+                .empresa(solicitud.getEmpresa())
+                .cargo(solicitud.getCargo())
+                .activo(true)
+                .verificado(false)
+                .intentosFallidos(0)
+                .build();
+
+        // Generar token de verificación
+        String tokenVerificacion = UUID.randomUUID().toString();
+        usuario.setTokenVerificacion(tokenVerificacion);
+        usuario.setTokenVerificacionExpiracion(LocalDateTime.now().plusHours(24));
+
+        // Guardar usuario
+        usuario = repositorioUsuario.save(usuario);
+
+        // Enviar email de verificación
+        try {
+            servicioEmail.enviarEmailVerificacion(usuario.getEmail(), tokenVerificacion);
+        } catch (Exception e) {
+            // Log error pero no fallar el registro
+            System.err.println("Error al enviar email de verificación: " + e.getMessage());
+        }
+
+        // Generar JWT
+        var jwtToken = servicioJWT.generarToken(usuario);
+
+        return RespuestaAutenticacion.builder()
+                .token(jwtToken)
+                .tipoToken("Bearer")
+                .id(usuario.getId())
+                .nombreUsuario(usuario.getNombreUsuario())
+                .email(usuario.getEmail())
+                .nombreCompleto(usuario.getNombreCompleto())
+                .rol(usuario.getRol())
+                .verificado(usuario.getVerificado())
+                .mensaje("Usuario registrado exitosamente. Por favor verifica tu email.")
+                .build();
+    }
+
     /**
      * Autentica un usuario existente
      */

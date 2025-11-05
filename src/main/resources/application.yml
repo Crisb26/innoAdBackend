@@ -85,7 +85,7 @@ innoad:
   maintenance:
     security-code: ${MAINTENANCE_CODE:93022611184}
     email-for-recovery: ${MAINTENANCE_EMAIL:admin@innoad.com}
-  
+
   # Configuración del agente de IA
   ai:
     api-url: ${AI_API_URL:https://api.openai.com/v1}
@@ -93,10 +93,15 @@ innoad:
     model: ${AI_MODEL:gpt-4}
     max-tokens: 2000
     temperature: 0.7
-  
+
   # Capacidad máxima de usuarios
   max-users: 1000
-  
+
+  # Configuración de almacenamiento de archivos
+  storage:
+    directory: ${STORAGE_DIRECTORY:uploads}
+    base-url: ${STORAGE_BASE_URL:http://localhost:8081/uploads}
+
   # URLs del frontend
   frontend:
     url: ${FRONTEND_URL:http://localhost:8080}

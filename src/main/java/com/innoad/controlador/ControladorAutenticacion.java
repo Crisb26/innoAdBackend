@@ -2,6 +2,9 @@ package com.innoad.controlador;
 
 import com.innoad.dto.solicitud.SolicitudLogin;
 import com.innoad.dto.solicitud.SolicitudRegistro;
+import com.innoad.dto.solicitud.SolicitudRegistroPublico;
+import com.innoad.dto.solicitud.SolicitudRecuperacionContrasena;
+import com.innoad.dto.solicitud.SolicitudRestablecerContrasena;
 import com.innoad.dto.respuesta.RespuestaAutenticacion;
 import com.innoad.dto.respuesta.RespuestaAPI;
 import com.innoad.dto.respuesta.RespuestaLogin;
@@ -22,6 +25,36 @@ public class ControladorAutenticacion {
     
     private final ServicioAutenticacion servicioAutenticacion;
     
+    /**
+     * Registro público de usuarios - Solo crea usuarios con rol "USUARIO"
+     * Este endpoint es usado por la página pública de registro
+     */
+    @PostMapping("/registrarse")
+    public ResponseEntity<RespuestaAPI<RespuestaAutenticacion>> registrarsePublico(
+            @Valid @RequestBody SolicitudRegistroPublico solicitud
+    ) {
+        try {
+            RespuestaAutenticacion respuesta = servicioAutenticacion.registrarPublico(solicitud);
+            return ResponseEntity.ok(
+                    RespuestaAPI.<RespuestaAutenticacion>builder()
+                            .exitoso(true)
+                            .mensaje("Usuario registrado exitosamente. Por favor verifica tu email.")
+                            .datos(respuesta)
+                            .build()
+            );
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(RespuestaAPI.<RespuestaAutenticacion>builder()
+                            .exitoso(false)
+                            .mensaje("Error al registrar: " + e.getMessage())
+                            .build());
+        }
+    }
+
+    /**
+     * Registro administrativo - Permite crear usuarios con cualquier rol
+     * Solo accesible por administradores
+     */
     @PostMapping("/registrar")
     public ResponseEntity<RespuestaAutenticacion> registrar(
             @Valid @RequestBody SolicitudRegistro solicitud
@@ -72,43 +105,47 @@ public class ControladorAutenticacion {
     }
     
     @PostMapping("/recuperar-contrasena")
-    public ResponseEntity<Map<String, String>> recuperarContrasena(
-            @RequestBody Map<String, String> solicitud
+    public ResponseEntity<RespuestaAPI<Void>> recuperarContrasena(
+            @Valid @RequestBody SolicitudRecuperacionContrasena solicitud
     ) {
         try {
-            servicioAutenticacion.solicitarRecuperacionContrasena(solicitud.get("email"));
-            return ResponseEntity.ok(Map.of(
-                    "mensaje", "Email de recuperación enviado exitosamente",
-                    "exito", "true"
-            ));
+            servicioAutenticacion.solicitarRecuperacionContrasena(solicitud.getEmail());
+            return ResponseEntity.ok(
+                    RespuestaAPI.<Void>builder()
+                            .exitoso(true)
+                            .mensaje("Email de recuperación enviado exitosamente. Por favor revisa tu correo.")
+                            .build()
+            );
         } catch (Exception e) {
             return ResponseEntity.badRequest()
-                    .body(Map.of(
-                            "mensaje", "Error: " + e.getMessage(),
-                            "exito", "false"
-                    ));
+                    .body(RespuestaAPI.<Void>builder()
+                            .exitoso(false)
+                            .mensaje("Error: " + e.getMessage())
+                            .build());
         }
     }
     
     @PostMapping("/restablecer-contrasena")
-    public ResponseEntity<Map<String, String>> restablecerContrasena(
-            @RequestBody Map<String, String> solicitud
+    public ResponseEntity<RespuestaAPI<Void>> restablecerContrasena(
+            @Valid @RequestBody SolicitudRestablecerContrasena solicitud
     ) {
         try {
             servicioAutenticacion.restablecerContrasena(
-                    solicitud.get("token"),
-                    solicitud.get("nuevaContrasena")
+                    solicitud.getToken(),
+                    solicitud.getNuevaContrasena()
             );
-            return ResponseEntity.ok(Map.of(
-                    "mensaje", "Contraseña restablecida exitosamente",
-                    "exito", "true"
-            ));
+            return ResponseEntity.ok(
+                    RespuestaAPI.<Void>builder()
+                            .exitoso(true)
+                            .mensaje("Contraseña restablecida exitosamente. Ya puedes iniciar sesión.")
+                            .build()
+            );
         } catch (Exception e) {
             return ResponseEntity.badRequest()
-                    .body(Map.of(
-                            "mensaje", "Error: " + e.getMessage(),
-                            "exito", "false"
-                    ));
+                    .body(RespuestaAPI.<Void>builder()
+                            .exitoso(false)
+                            .mensaje("Error: " + e.getMessage())
+                            .build());
         }
     }
 

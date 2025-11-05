@@ -40,26 +40,32 @@ public class ConfiguracionSeguridad {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        // Endpoints públicos
+                        // Endpoints públicos (sin autenticación)
                         .requestMatchers(
                                 "/api/autenticacion/**",
                                 "/api/v1/autenticacion/**",
+                                "/api/v1/raspberry/**",  // API para Raspberry Pi
                                 "/api/mantenimiento/estado",
                                 "/swagger-ui/**",
                                 "/api-docs/**",
                                 "/actuator/health",
                                 "/h2-console/**",
+                                "/uploads/**",  // Archivos subidos
                                 "/error"
                         ).permitAll()
-                        
+
                         // Endpoints solo para administradores
                         .requestMatchers("/api/admin/**", "/api/mantenimiento/activar", "/api/mantenimiento/desactivar")
                         .hasRole("ADMINISTRADOR")
-                        
+
                         // Endpoints para técnicos y desarrolladores
                         .requestMatchers("/api/tecnico/**")
                         .hasAnyRole("ADMINISTRADOR", "TECNICO", "DESARROLLADOR")
-                        
+
+                        // Endpoints de pantallas y contenidos (usuarios autenticados)
+                        .requestMatchers("/api/v1/pantallas/**", "/api/v1/contenidos/**")
+                        .authenticated()
+
                         // Resto de endpoints requieren autenticación
                         .anyRequest().authenticated()
                 )
@@ -93,10 +99,10 @@ public class ConfiguracionSeguridad {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:8080",
-                "http://localhost:4200",
-                "http://127.0.0.1:8080",
+        // Permitir cualquier puerto localhost en desarrollo
+        configuration.setAllowedOriginPatterns(Arrays.asList(
+                "http://localhost:*",
+                "http://127.0.0.1:*",
                 "https://innoad.com",
                 "https://www.innoad.com"
         ));
@@ -104,7 +110,7 @@ public class ConfiguracionSeguridad {
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
-        
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
