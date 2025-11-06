@@ -104,4 +104,35 @@ public interface RepositorioUsuario extends JpaRepository<Usuario, Long> {
      * Busca usuarios por rol y estado activo
      */
     List<Usuario> findByRolAndActivo(RolUsuario rol, Boolean activo);
+
+    /**
+     * Cuenta usuarios por rol
+     */
+    Long countByRol(RolUsuario rol);
+
+    /**
+     * Cuenta usuarios verificados
+     */
+    Long countByVerificado(Boolean verificado);
+
+    /**
+     * Cuenta usuarios inactivos
+     */
+    @Query("SELECT COUNT(u) FROM Usuario u WHERE u.activo = false")
+    Long contarUsuariosInactivos();
+
+    /**
+     * Busca todos los usuarios ordenados por fecha de registro descendente
+     */
+    List<Usuario> findAllByOrderByFechaRegistroDesc();
+
+    /**
+     * Busca usuarios con búsqueda general
+     */
+    @Query("SELECT u FROM Usuario u WHERE " +
+           "LOWER(u.nombreUsuario) LIKE LOWER(CONCAT('%', :termino, '%')) OR " +
+           "LOWER(u.email) LIKE LOWER(CONCAT('%', :termino, '%')) OR " +
+           "LOWER(u.nombre) LIKE LOWER(CONCAT('%', :termino, '%')) OR " +
+           "LOWER(u.apellido) LIKE LOWER(CONCAT('%', :termino, '%'))")
+    List<Usuario> buscarUsuarios(@Param("termino") String termino);
 }

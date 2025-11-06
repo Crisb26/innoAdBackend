@@ -62,21 +62,19 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
         
-        <!-- Base de Datos - H2 (En memoria, perfecto para desarrollo sin PostgreSQL) -->
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        
-        <!-- PostgreSQL (Comentado - Úsalo cuando instales PostgreSQL) -->
-        <!-- 
+        <!-- Base de Datos - PostgreSQL para producción -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
-        -->
+
+        <!-- H2 Database (Para testing, opcional) -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
         
         <!-- JWT -->
         <dependency>

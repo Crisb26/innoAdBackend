@@ -126,4 +126,10 @@ public interface RepositorioContenido extends JpaRepository<Contenido, Long> {
            "AND c.estado = 'ACTIVO' " +
            "ORDER BY c.prioridad DESC, c.orden ASC, c.fechaCreacion ASC")
     List<Contenido> findContenidosParaReproduccion(@Param("pantallaId") Long pantallaId);
+
+    /**
+     * Cuenta contenidos activos
+     */
+    @Query("SELECT COUNT(c) FROM Contenido c WHERE c.estado = 'ACTIVO'")
+    Long countByActivoTrue();
 }

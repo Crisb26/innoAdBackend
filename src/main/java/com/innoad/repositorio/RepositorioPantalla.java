@@ -81,4 +81,10 @@ public interface RepositorioPantalla extends JpaRepository<Pantalla, Long> {
      */
     @Query("SELECT p FROM Pantalla p WHERE p.ultimaConexion IS NULL OR p.ultimaConexion < :fechaLimite")
     List<Pantalla> findPantallasDesconectadas(@Param("fechaLimite") LocalDateTime fechaLimite);
+
+    /**
+     * Cuenta pantallas activas
+     */
+    @Query("SELECT COUNT(p) FROM Pantalla p WHERE p.estado = 'ACTIVA'")
+    Long countByActivoTrue();
 }

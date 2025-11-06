@@ -1,72 +1,47 @@
 # InnoAd Backend
 
-Sistema de gestion de publicidad con IA integrada - API REST
+Sistema de Gestion de Publicidad Digital con Inteligencia Artificial
 
-## Despliegue Rapido
+## Descripcion
 
-### Backend (Puerto 8081)
+Backend RESTful desarrollado en Spring Boot para la gestion de campañas publicitarias, pantallas digitales Raspberry Pi y contenidos multimedia.
 
-```bash
-cd "c:\Users\bueno\Desktop\PROYECTO FINAL INNOAD\innoadBackend"
-deploy.bat
-```
+## Tecnologias
 
-El backend se ejecutara en: **http://localhost:8081**
-
-## Endpoints Principales
-
-- API Base: http://localhost:8081/api/v1
-- Health Check: http://localhost:8081/actuator/health
-- API Docs: http://localhost:8081/swagger-ui.html
-- H2 Console: http://localhost:8081/h2-console
-
-## Autenticacion
-
-### Usuarios por defecto
-
-| Usuario | Password | Rol |
-|---------|----------|-----|
-| admin | Admin123! | ADMINISTRADOR |
-| tecnico | Tecnico123! | TECNICO |
-| developer | Dev123! | DESARROLLADOR |
-| usuario | Usuario123! | USUARIO |
-
-### Ejemplo de Login
-
-```bash
-POST http://localhost:8081/api/v1/autenticacion/iniciar-sesion
-Content-Type: application/json
-
-{
-  "nombreUsuarioOEmail": "admin",
-  "contrasena": "Admin123!"
-}
-```
+- Java 21
+- Spring Boot 3.5.0
+- PostgreSQL 14+
+- Spring Security con JWT
+- Spring Data JPA Hibernate
+- Maven 3.8+
+- OpenAPI Swagger
 
 ## Requisitos
 
-- Java 21
-- Maven 3.9+
+- JDK 21 o superior
+- Maven 3.8+
+- PostgreSQL 14 o superior
 
-## Stack Tecnologico
+## Instalacion
 
-- Spring Boot 3.5.0
-- Spring Security + JWT
-- H2 Database (en memoria)
-- Spring Data JPA
-- Lombok
-- OpenAPI/Swagger
+1. Instalar PostgreSQL
+2. Crear base de datos: psql -U postgres -f innoad_postgresql_schema.sql
+3. Configurar variables de entorno
+4. Compilar: mvn clean install
+5. Ejecutar: mvn spring-boot:run
 
-## Integracion con Frontend
+Aplicacion disponible en http://localhost:8081
 
-CORS configurado para:
-- http://localhost:8080 (Frontend en produccion)
-- http://localhost:4200 (Frontend en desarrollo)
-- http://127.0.0.1:8080
+## Documentacion API
 
-## Compilacion Manual
+Swagger UI: http://localhost:8081/swagger-ui.html
 
-```bash
-mvn clean package -DskipTests
-java -jar target/innoad-backend-2.0.0.jar
-```
+## Usuarios por Defecto
+
+- admin / Admin123! (ADMINISTRADOR)
+- cliente_demo / Admin123! (CLIENTE)
+- tecnico_demo / Admin123! (TECNICO)
+
+## Licencia
+
+Copyright 2025 InnoAd
