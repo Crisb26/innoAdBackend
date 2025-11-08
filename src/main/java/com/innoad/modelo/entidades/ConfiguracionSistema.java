@@ -40,6 +40,7 @@ public class ConfiguracionSistema {
     private Long usuarioActualizacionId; // ID del usuario que actualizó
     
     // Configuraciones específicas para modo mantenimiento
+    @Builder.Default
     @Column
     private Boolean modoMantenimientoActivo = false;
     

@@ -2,6 +2,7 @@ package com.innoad.configuracion;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.lang.NonNull;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -17,7 +18,7 @@ public class ConfiguracionWeb implements WebMvcConfigurer {
     private String directorioAlmacenamiento;
 
     @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    public void addResourceHandlers(@NonNull ResourceHandlerRegistry registry) {
         // Servir archivos desde el directorio de uploads
         String ubicacionRecursos = "file:" + Paths.get(directorioAlmacenamiento).toAbsolutePath().toString() + "/";
 

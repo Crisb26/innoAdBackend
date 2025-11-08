@@ -55,6 +55,7 @@ public class ConversacionIA {
     @Column(columnDefinition = "TEXT")
     private String retroalimentacion; // Comentarios del usuario
     
+    @Builder.Default
     @Column
     private Boolean exitoso = true; // Si la respuesta fue satisfactoria
     

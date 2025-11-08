@@ -11,11 +11,12 @@ spring:
     username: ${DATABASE_USERNAME:postgres}
     password: ${DATABASE_PASSWORD:Cris930226**}
     hikari:
-      connection-timeout: 20000
-      maximum-pool-size: 50
-      minimum-idle: 10
-      idle-timeout: 300000
-      max-lifetime: 1200000
+      connection-timeout: 30000
+      maximum-pool-size: 100
+      minimum-idle: 20
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      leak-detection-threshold: 60000
 
   # ===== CONFIGURACION JPA/HIBERNATE =====
   jpa:
@@ -95,28 +96,38 @@ innoad:
     max-tokens: 2000
     temperature: 0.7
 
-  # Capacidad máxima de usuarios
-  max-users: 1500
+  # Capacidad maxima de usuarios
+  max-users: 2000
 
-  # Configuración de almacenamiento de archivos
+  # Configuracion de almacenamiento de archivos
   storage:
     directory: ${STORAGE_DIRECTORY:uploads}
     base-url: ${STORAGE_BASE_URL:http://localhost:8081/uploads}
 
   # URLs del frontend
   frontend:
-    url: ${FRONTEND_URL:http://localhost:8080}
+    url: ${FRONTEND_URL:http://localhost:3000}
     allowed-origins:
+      - http://localhost:3000
+      - http://localhost:5173
       - http://localhost:8080
+      - http://127.0.0.1:3000
+      - http://127.0.0.1:5173
       - http://127.0.0.1:8080
-      - http://localhost:4200
       - https://innoad.com
       - https://www.innoad.com
 
 
-# Configuración de servidor
+# Configuracion de servidor
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
+  tomcat:
+    threads:
+      max: 400
+      min-spare: 50
+    connection-timeout: 30s
+    max-connections: 10000
+    accept-count: 200
   error:
     include-message: always
     include-binding-errors: always
@@ -125,6 +136,7 @@ server:
   compression:
     enabled: true
     mime-types: application/json,application/xml,text/html,text/xml,text/plain
+    min-response-size: 1024
 
 
 # Configuración de logging

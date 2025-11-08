@@ -1,59 +1,33 @@
-# Build / IDE
-/target/
+# Build artifacts
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+*.jar
+*.war
+*.ear
+*.class
+
+# Maven
 .mvn/
+mvnw
+mvnw.cmd
+
+# IDE
 .idea/
 .vscode/
 .classpath
 .project
 .settings/
-*.iml
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Logs and runtime
-logs/
-*.log
-run-log.txt
-run-err.txt
-
-# Environment
-.env
-secrets.properties
-
-# Docker
-.dockerignore
-
-# Node / Frontend
-node_modules/
-dist/
-
-# Dependency Check reports
-target/dependency-check-report/
-target/dependency-check-data/
-HELP.md
-target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
 .springBeans
 .sts4-cache
-
-### IntelliJ IDEA ###
-.idea
-*.iws
 *.iml
+*.iws
 *.ipr
+.apt_generated
+.factorypath
 
-### NetBeans ###
+# NetBeans
 /nbproject/private/
 /nbbuild/
 /dist/
@@ -63,14 +37,42 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### VS Code ###
-.vscode/
+# OS
+.DS_Store
+Thumbs.db
+nul
 
-### Logs ###
+# Logs
 logs/
 *.log
+run-log.txt
+run-err.txt
 
-### Environment ###
+# Environment variables
 .env
 .env.local
-nul  
+.env.production
+secrets.properties
+
+# Docker (keep configs)
+# .dockerignore
+
+# Frontend build
+node_modules/
+dist/
+
+# Dependency Check
+target/dependency-check-report/
+target/dependency-check-data/
+
+# Temporary files
+*.bat
+*.cmd
+*.tmp
+*.bak
+*~
+*.swp
+*.swo
+
+# Documentation (keep README.md)
+HELP.md  

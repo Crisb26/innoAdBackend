@@ -74,9 +74,11 @@ public class Usuario implements UserDetails {
     @Column(columnDefinition = "TEXT")
     private String fotoPerfil; // URL o Base64
     
+    @Builder.Default
     @Column(nullable = false)
     private Boolean activo = true;
     
+    @Builder.Default
     @Column(nullable = false)
     private Boolean verificado = false;
     
@@ -98,6 +100,7 @@ public class Usuario implements UserDetails {
     @Column
     private LocalDateTime tokenRecuperacionExpiracion;
     
+    @Builder.Default
     @Column
     private Integer intentosFallidos = 0;
     

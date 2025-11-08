@@ -23,8 +23,6 @@ public class ServicioVerificacionEmail {
 
     private final RepositorioTokenVerificacion repositorioToken;
     private final RepositorioUsuario repositorioUsuario;
-    // TODO: Agregar ServicioEmail cuando esté configurado
-    // private final ServicioEmail servicioEmail;
 
     /**
      * Genera un token de verificación para un usuario
@@ -47,21 +45,13 @@ public class ServicioVerificacionEmail {
 
     /**
      * Envía el email de verificación (asíncrono)
-     * TODO: Implementar cuando se configure el servicio de email
+     * En desarrollo: muestra el enlace en consola
+     * En producción: integrar con servicio SMTP real
      */
     @Async
     public void enviarEmailVerificacion(Usuario usuario, String token) {
         try {
             String urlVerificacion = "http://localhost:4200/autenticacion/verificar-email?token=" + token;
-
-            // TODO: Descomentar cuando el servicio de email esté configurado
-            /*
-            servicioEmail.enviarEmail(
-                usuario.getEmail(),
-                "Verifica tu cuenta de InnoAd",
-                construirEmailVerificacion(usuario.getNombre(), urlVerificacion)
-            );
-            */
 
             log.info("Email de verificación enviado a: {} con URL: {}", usuario.getEmail(), urlVerificacion);
 

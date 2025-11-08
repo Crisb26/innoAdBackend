@@ -7,8 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -64,18 +62,22 @@ public class Publicidad {
     @Column(length = 50)
     private String estado; // BORRADOR, ACTIVA, PAUSADA, FINALIZADA
     
+    @Builder.Default
     @Column
-    private Integer impresiones = 0; // Número de veces mostrada
+    private Integer impresiones = 0; // Numero de veces mostrada
     
+    @Builder.Default
     @Column
-    private Integer clics = 0; // Número de clics
+    private Integer clics = 0; // Numero de clics
     
+    @Builder.Default
     @Column
-    private Integer conversiones = 0; // Número de conversiones
+    private Integer conversiones = 0; // Numero de conversiones
     
     @Column
     private Double presupuesto; // Presupuesto asignado
     
+    @Builder.Default
     @Column
     private Double gastado = 0.0; // Monto gastado
     
@@ -88,6 +90,7 @@ public class Publicidad {
     @Column(columnDefinition = "TEXT")
     private String palabrasClave; // Keywords separadas por comas
     
+    @Builder.Default
     @Column
     private Boolean generadaPorIA = false; // Si fue creada con ayuda de IA
     
