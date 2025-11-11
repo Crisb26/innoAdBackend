@@ -85,6 +85,7 @@ public class ControladorRaspberryPi {
     public ResponseEntity<RespuestaAPI<Void>> registrarReproduccion(
             @PathVariable Long contenidoId,
             @RequestParam String codigoIdentificacion
+            
     ) {
         try {
             log.debug("Reproducción registrada - Contenido: {} - Pantalla: {}", contenidoId, codigoIdentificacion);
