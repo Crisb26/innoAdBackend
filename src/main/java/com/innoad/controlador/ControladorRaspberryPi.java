@@ -10,9 +10,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Map;
+
 
 /**
  * Controlador especial para Raspberry Pi
@@ -28,6 +28,7 @@ public class ControladorRaspberryPi {
 
     private final ServicioContenido servicioContenido;
     private final ServicioPantalla servicioPantalla;
+    
 
     /**
      * Sincroniza contenidos para una pantalla específica
@@ -85,7 +86,7 @@ public class ControladorRaspberryPi {
     public ResponseEntity<RespuestaAPI<Void>> registrarReproduccion(
             @PathVariable Long contenidoId,
             @RequestParam String codigoIdentificacion
-            
+
     ) {
         try {
             log.debug("Reproducción registrada - Contenido: {} - Pantalla: {}", contenidoId, codigoIdentificacion);
