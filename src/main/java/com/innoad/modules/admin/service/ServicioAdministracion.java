@@ -11,7 +11,7 @@ import com.innoad.modules.content.repository.RepositorioPublicidad;
 import com.innoad.modules.screens.repository.RepositorioPantalla;
 import com.innoad.modelo.enumeraciones.RolUsuario;
 import com.innoad.modules.admin.repository.RepositorioAuditoria;
-import com.innoad.repositorio.RepositorioConversacionIA;
+import com.innoad.modules.ia.repository.RepositorioConversacionIA;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;

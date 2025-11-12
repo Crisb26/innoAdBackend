@@ -1,11 +1,11 @@
-package com.innoad.servicio;
+package com.innoad.modules.ia.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.innoad.modelo.entidades.ConversacionIA;
+import com.innoad.modules.ia.domain.ConversacionIA;
 import com.innoad.modules.content.domain.Publicidad;
 import com.innoad.modules.auth.domain.Usuario;
-import com.innoad.repositorio.RepositorioConversacionIA;
+import com.innoad.modules.ia.repository.RepositorioConversacionIA;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

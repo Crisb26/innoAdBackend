@@ -1,6 +1,6 @@
-package com.innoad.repositorio;
+package com.innoad.modules.ia.repository;
 
-import com.innoad.modelo.entidades.ConversacionIA;
+import com.innoad.modules.ia.domain.ConversacionIA;
 import com.innoad.modules.auth.domain.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

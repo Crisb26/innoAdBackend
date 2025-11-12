@@ -1,4 +1,4 @@
-package com.innoad.modelo.entidades;
+package com.innoad.modules.ia.domain;
 
 import com.innoad.modules.auth.domain.Usuario;
 import jakarta.persistence.*;
