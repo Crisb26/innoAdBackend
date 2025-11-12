@@ -1,6 +1,6 @@
-package com.innoad.repositorio;
+package com.innoad.modules.admin.repository;
 
-import com.innoad.modelo.entidades.Auditoria;
+import com.innoad.modules.admin.domain.Auditoria;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

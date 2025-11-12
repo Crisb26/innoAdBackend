@@ -1,8 +1,9 @@
-package com.innoad.servicio;
+package com.innoad.modules.admin.service;
 
-import com.innoad.modelo.entidades.ConfiguracionSistema;
+import com.innoad.modules.admin.domain.ConfiguracionSistema;
 import com.innoad.modules.auth.domain.Usuario;
-import com.innoad.repositorio.RepositorioConfiguracionSistema;
+import com.innoad.modules.admin.repository.RepositorioConfiguracionSistema;
+import com.innoad.servicio.ServicioEmail;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;

@@ -1,16 +1,17 @@
-package com.innoad.servicio;
+package com.innoad.modules.admin.service;
 
 import com.innoad.dto.respuesta.RespuestaAuditoria;
 import com.innoad.dto.respuesta.RespuestaEstadisticas;
 import com.innoad.dto.respuesta.RespuestaUsuarioAdmin;
-import com.innoad.modelo.entidades.Auditoria;
+import com.innoad.modules.admin.domain.Auditoria;
 import com.innoad.modules.auth.domain.Usuario;
 import com.innoad.modules.auth.repository.RepositorioUsuario;
 import com.innoad.modules.content.repository.RepositorioContenido;
 import com.innoad.modules.content.repository.RepositorioPublicidad;
 import com.innoad.modules.screens.repository.RepositorioPantalla;
 import com.innoad.modelo.enumeraciones.RolUsuario;
-import com.innoad.repositorio.*;
+import com.innoad.modules.admin.repository.RepositorioAuditoria;
+import com.innoad.repositorio.RepositorioConversacionIA;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;

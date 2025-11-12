@@ -1,4 +1,4 @@
-package com.innoad.modelo.entidades;
+package com.innoad.modules.admin.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

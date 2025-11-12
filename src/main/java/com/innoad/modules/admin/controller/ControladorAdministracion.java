@@ -1,4 +1,4 @@
-package com.innoad.controlador;
+package com.innoad.modules.admin.controller;
 
 import com.innoad.dto.respuesta.RespuestaAPI;
 import com.innoad.dto.respuesta.RespuestaAuditoria;
@@ -7,8 +7,8 @@ import com.innoad.dto.respuesta.RespuestaUsuarioAdmin;
 import com.innoad.dto.solicitud.SolicitudCambiarRol;
 import com.innoad.dto.solicitud.SolicitudModoMantenimiento;
 import com.innoad.modules.auth.domain.Usuario;
-import com.innoad.servicio.ServicioAdministracion;
-import com.innoad.servicio.ServicioModoMantenimiento;
+import com.innoad.modules.admin.service.ServicioAdministracion;
+import com.innoad.modules.admin.service.ServicioModoMantenimiento;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

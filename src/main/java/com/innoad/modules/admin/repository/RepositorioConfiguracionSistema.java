@@ -1,6 +1,6 @@
-package com.innoad.repositorio;
+package com.innoad.modules.admin.repository;
 
-import com.innoad.modelo.entidades.ConfiguracionSistema;
+import com.innoad.modules.admin.domain.ConfiguracionSistema;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
