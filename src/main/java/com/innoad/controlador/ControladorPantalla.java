@@ -3,7 +3,7 @@ package com.innoad.controlador;
 import com.innoad.dto.solicitud.SolicitudPantalla;
 import com.innoad.dto.respuesta.RespuestaAPI;
 import com.innoad.dto.respuesta.RespuestaPantalla;
-import com.innoad.modelo.entidades.Usuario;
+import com.innoad.modules.auth.domain.Usuario;
 import com.innoad.servicio.ServicioPantalla;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

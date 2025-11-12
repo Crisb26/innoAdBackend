@@ -1,9 +1,9 @@
-package com.innoad.servicio;
+package com.innoad.modules.auth.service;
 
-import com.innoad.modelo.entidades.TokenVerificacion;
-import com.innoad.modelo.entidades.Usuario;
-import com.innoad.repositorio.RepositorioTokenVerificacion;
-import com.innoad.repositorio.RepositorioUsuario;
+import com.innoad.modules.auth.domain.TokenVerificacion;
+import com.innoad.modules.auth.domain.Usuario;
+import com.innoad.modules.auth.repository.RepositorioTokenVerificacion;
+import com.innoad.modules.auth.repository.RepositorioUsuario;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;

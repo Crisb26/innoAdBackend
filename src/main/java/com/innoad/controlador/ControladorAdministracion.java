@@ -6,7 +6,7 @@ import com.innoad.dto.respuesta.RespuestaEstadisticas;
 import com.innoad.dto.respuesta.RespuestaUsuarioAdmin;
 import com.innoad.dto.solicitud.SolicitudCambiarRol;
 import com.innoad.dto.solicitud.SolicitudModoMantenimiento;
-import com.innoad.modelo.entidades.Usuario;
+import com.innoad.modules.auth.domain.Usuario;
 import com.innoad.servicio.ServicioAdministracion;
 import com.innoad.servicio.ServicioModoMantenimiento;
 import jakarta.servlet.http.HttpServletRequest;

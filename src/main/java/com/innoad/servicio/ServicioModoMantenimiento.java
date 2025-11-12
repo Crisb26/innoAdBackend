@@ -1,7 +1,7 @@
 package com.innoad.servicio;
 
 import com.innoad.modelo.entidades.ConfiguracionSistema;
-import com.innoad.modelo.entidades.Usuario;
+import com.innoad.modules.auth.domain.Usuario;
 import com.innoad.repositorio.RepositorioConfiguracionSistema;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

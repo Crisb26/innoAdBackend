@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.innoad.modelo.entidades.ConversacionIA;
 import com.innoad.modelo.entidades.Publicidad;
-import com.innoad.modelo.entidades.Usuario;
+import com.innoad.modules.auth.domain.Usuario;
 import com.innoad.repositorio.RepositorioConversacionIA;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

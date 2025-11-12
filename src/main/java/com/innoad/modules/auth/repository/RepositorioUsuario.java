@@ -1,6 +1,6 @@
-package com.innoad.repositorio;
+package com.innoad.modules.auth.repository;
 
-import com.innoad.modelo.entidades.Usuario;
+import com.innoad.modules.auth.domain.Usuario;
 import com.innoad.modelo.enumeraciones.RolUsuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

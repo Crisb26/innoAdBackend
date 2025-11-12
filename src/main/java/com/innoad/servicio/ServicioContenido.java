@@ -4,7 +4,7 @@ import com.innoad.dto.solicitud.SolicitudContenido;
 import com.innoad.dto.respuesta.RespuestaContenido;
 import com.innoad.modelo.entidades.Contenido;
 import com.innoad.modelo.entidades.Pantalla;
-import com.innoad.modelo.entidades.Usuario;
+import com.innoad.modules.auth.domain.Usuario;
 import com.innoad.repositorio.RepositorioContenido;
 import com.innoad.repositorio.RepositorioPantalla;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.innoad.servicio;
+package com.innoad.modules.auth.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

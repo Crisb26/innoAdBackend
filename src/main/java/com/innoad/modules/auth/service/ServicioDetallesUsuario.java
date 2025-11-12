@@ -1,6 +1,6 @@
-package com.innoad.servicio;
+package com.innoad.modules.auth.service;
 
-import com.innoad.repositorio.RepositorioUsuario;
+import com.innoad.modules.auth.repository.RepositorioUsuario;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

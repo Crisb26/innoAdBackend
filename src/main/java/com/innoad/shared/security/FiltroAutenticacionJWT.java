@@ -1,6 +1,6 @@
 package com.innoad.shared.security;
 
-import com.innoad.servicio.ServicioJWT;
+import com.innoad.modules.auth.service.ServicioJWT;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

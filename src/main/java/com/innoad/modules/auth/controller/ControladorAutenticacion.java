@@ -1,4 +1,4 @@
-package com.innoad.controlador;
+package com.innoad.modules.auth.controller;
 
 import com.innoad.dto.solicitud.SolicitudLogin;
 import com.innoad.dto.solicitud.SolicitudRegistro;
@@ -9,7 +9,7 @@ import com.innoad.dto.respuesta.RespuestaAutenticacion;
 import com.innoad.dto.respuesta.RespuestaAPI;
 import com.innoad.dto.respuesta.RespuestaLogin;
 import com.innoad.dto.solicitud.SolicitudRefreshToken;
-import com.innoad.servicio.ServicioAutenticacion;
+import com.innoad.modules.auth.service.ServicioAutenticacion;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

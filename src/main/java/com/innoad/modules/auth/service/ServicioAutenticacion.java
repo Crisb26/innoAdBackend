@@ -1,4 +1,4 @@
-package com.innoad.servicio;
+package com.innoad.modules.auth.service;
 
 import com.innoad.dto.solicitud.SolicitudLogin;
 import com.innoad.dto.solicitud.SolicitudRegistro;
@@ -6,9 +6,10 @@ import com.innoad.dto.solicitud.SolicitudRegistroPublico;
 import com.innoad.dto.respuesta.RespuestaAutenticacion;
 import com.innoad.dto.respuesta.RespuestaAPI;
 import com.innoad.dto.respuesta.RespuestaLogin;
-import com.innoad.modelo.entidades.Usuario;
+import com.innoad.modules.auth.domain.Usuario;
 import com.innoad.modelo.enumeraciones.RolUsuario;
-import com.innoad.repositorio.RepositorioUsuario;
+import com.innoad.modules.auth.repository.RepositorioUsuario;
+import com.innoad.servicio.ServicioEmail;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;

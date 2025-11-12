@@ -2,7 +2,7 @@ package com.innoad.repositorio;
 
 import com.innoad.modelo.entidades.Contenido;
 import com.innoad.modelo.entidades.Pantalla;
-import com.innoad.modelo.entidades.Usuario;
+import com.innoad.modules.auth.domain.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
