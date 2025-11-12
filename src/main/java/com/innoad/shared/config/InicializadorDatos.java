@@ -1,4 +1,4 @@
-package com.innoad.configuracion;
+package com.innoad.shared.config;
 
 import com.innoad.modelo.entidades.Usuario;
 import com.innoad.modelo.enumeraciones.RolUsuario;

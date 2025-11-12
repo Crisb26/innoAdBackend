@@ -1,4 +1,4 @@
-package com.innoad.configuracion;
+package com.innoad.shared.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationArguments;

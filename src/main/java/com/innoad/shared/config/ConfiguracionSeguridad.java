@@ -1,6 +1,6 @@
-package com.innoad.configuracion;
+package com.innoad.shared.config;
 
-import com.innoad.filtro.FiltroAutenticacionJWT;
+import com.innoad.shared.security.FiltroAutenticacionJWT;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

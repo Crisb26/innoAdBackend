@@ -1,4 +1,4 @@
-package com.innoad.filtro;
+package com.innoad.shared.security;
 
 import com.innoad.servicio.ServicioJWT;
 import jakarta.servlet.FilterChain;
