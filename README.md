@@ -1,137 +1,113 @@
 # InnoAd Backend
 
-API REST para sistema de gestión de campañas publicitarias digitales con pantallas inteligentes.
+REST API for digital advertising campaign management with intelligent screens.
 
-## Tecnologías
+## Stack
 
-- **Spring Boot** 3.5.7
-- **Java** 21
-- **PostgreSQL** 18
-- **Maven** 3.9.11
-- **JWT** Authentication
-- **Spring Security**
-- **Docker** support
+- Spring Boot 3.5.7
+- Java 21
+- PostgreSQL 16
+- Maven 3.9.11
+- JWT Authentication
+- Spring Security
+- Docker
 
-## Requisitos
+## Requirements
 
-- Java 21 o superior
+- Java 21+
 - Maven 3.9+
 - PostgreSQL 16+
-- Docker (opcional)
+- Docker (recommended)
 
-## Instalación
+## Quick Start
 
-### Opción 1: Con Docker
+### Docker (Recommended)
 
 ```bash
-docker-compose up -d
+docker-compose -f docker-compose.full.yml up -d --build
 ```
 
-### Opción 2: Local
+Access:
+- API: http://localhost:8080
+- Swagger: http://localhost:8080/swagger-ui.html
+- PostgreSQL: localhost:5432
 
-1. Crear base de datos PostgreSQL:
-```sql
-CREATE DATABASE innoad_db;
-```
+### Local Development
 
-2. Configurar variables de entorno (opcional):
-```bash
-export DATABASE_URL=jdbc:postgresql://localhost:5432/innoad_db
-export DATABASE_USERNAME=postgres
-export DATABASE_PASSWORD=tu_password
-```
-
-3. Compilar:
 ```bash
 mvn clean package -DskipTests
-```
-
-4. Ejecutar:
-```bash
 java -jar target/innoad-backend-2.0.0.jar
 ```
 
-5. Verificar: http://localhost:8080/actuator/health
+## Configuration
 
-## Configuración
+- Port: 8080
+- Context: /api/v1
+- Database: PostgreSQL
+- JWT Expiration: 24h
+- CORS: http://localhost:4200
 
-- **Puerto**: 8080
-- **Context Path**: `/api/v1`
-- **Base de datos**: PostgreSQL (auto-creación de tablas con Hibernate)
-- **JWT**: Expiración 24 horas
-- **CORS**: Configurado para `http://localhost:4200`
+## API Endpoints
 
-## API Documentation
+### Authentication
+- POST /api/v1/autenticacion/iniciar-sesion
+- POST /api/v1/autenticacion/registrar
+- POST /api/v1/autenticacion/refresh
 
-Swagger UI: http://localhost:8080/swagger-ui.html
+### Campaigns
+- GET /api/v1/campanas
+- POST /api/v1/campanas
+- PUT /api/v1/campanas/{id}
+- DELETE /api/v1/campanas/{id}
 
-## Principales Endpoints
+### Content
+- GET /api/v1/contenidos
+- POST /api/v1/contenidos
+- GET /api/v1/contenidos/{id}
 
-### Autenticación
-- `POST /api/v1/autenticacion/iniciar-sesion` - Login
-- `POST /api/v1/autenticacion/registrar` - Registro
-- `POST /api/v1/autenticacion/refresh` - Refrescar token
+### Screens
+- GET /api/v1/pantallas
+- POST /api/v1/pantallas
+- PUT /api/v1/pantallas/{id}
 
-### Campañas
-- `GET /api/v1/campanas` - Listar campañas
-- `POST /api/v1/campanas` - Crear campaña
-- `PUT /api/v1/campanas/{id}` - Actualizar campaña
-- `DELETE /api/v1/campanas/{id}` - Eliminar campaña
-
-### Contenidos
-- `GET /api/v1/contenidos` - Listar contenidos
-- `POST /api/v1/contenidos` - Subir contenido
-- `GET /api/v1/contenidos/{id}` - Obtener contenido
-
-### Pantallas
-- `GET /api/v1/pantallas` - Listar pantallas
-- `POST /api/v1/pantallas` - Registrar pantalla
-- `PUT /api/v1/pantallas/{id}` - Actualizar pantalla
-
-## Estructura del Proyecto
+## Project Structure
 
 ```
 src/main/java/com/innoad/
-├── configuracion/      # Configuraciones de Spring
-├── controlador/        # Controladores REST
+├── configuracion/      # Spring Configuration
+├── controlador/        # REST Controllers
 ├── dto/                # Data Transfer Objects
-├── modelo/             # Entidades JPA
-├── repositorio/        # Repositorios JPA
-├── servicio/           # Lógica de negocio
-├── filtro/             # Filtros de seguridad
-└── utilidad/           # Utilidades
+├── modelo/             # JPA Entities
+├── repositorio/        # JPA Repositories
+├── servicio/           # Business Logic
+├── filtro/             # Security Filters
+└── utilidad/           # Utilities
 ```
 
-## Perfiles
+## Profiles
 
-- **dev**: Desarrollo (application-dev.yml)
-- **prod**: Producción (application-prod.yml)
+- dev: application-dev.yml
+- prod: application-prod.yml
 
-Activar perfil:
 ```bash
 java -jar target/innoad-backend-2.0.0.jar --spring.profiles.active=prod
 ```
-      application.yml - Configuracion principal
-      DATABASE-SCRIPT.sql - Script base de datos
 
+## Database
 
-DESARROLLO
+Run DATABASE-SCRIPT.sql to initialize the database with all tables and seed data.
 
-mvn spring-boot:run
+## Default Users
 
+- admin / Admin123!
+- tecnico / Admin123!
+- dev / Admin123!
+- usuario / Admin123!
 
-PRODUCCION
-
-mvn clean package -DskipTests
-java -jar target\innoad-backend-2.0.0.jar
-
-
-REPOSITORIO
+## Repository
 
 https://github.com/Crisb26/innoadBackend
 
+## License
 
-CONTACTO
-
-Cristian Bueno
-cristianbueno@innoad.com
+MIT
