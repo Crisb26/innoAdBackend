@@ -3,7 +3,7 @@ package com.innoad.servicio;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.innoad.modelo.entidades.ConversacionIA;
-import com.innoad.modelo.entidades.Publicidad;
+import com.innoad.modules.content.domain.Publicidad;
 import com.innoad.modules.auth.domain.Usuario;
 import com.innoad.repositorio.RepositorioConversacionIA;
 import lombok.RequiredArgsConstructor;

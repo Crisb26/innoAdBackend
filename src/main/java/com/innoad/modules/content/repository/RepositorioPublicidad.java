@@ -1,6 +1,6 @@
-package com.innoad.repositorio;
+package com.innoad.modules.content.repository;
 
-import com.innoad.modelo.entidades.Publicidad;
+import com.innoad.modules.content.domain.Publicidad;
 import com.innoad.modules.auth.domain.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

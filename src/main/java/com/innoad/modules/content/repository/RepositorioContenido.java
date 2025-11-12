@@ -1,6 +1,6 @@
-package com.innoad.repositorio;
+package com.innoad.modules.content.repository;
 
-import com.innoad.modelo.entidades.Contenido;
+import com.innoad.modules.content.domain.Contenido;
 import com.innoad.modelo.entidades.Pantalla;
 import com.innoad.modules.auth.domain.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;

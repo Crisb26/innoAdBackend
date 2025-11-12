@@ -1,10 +1,10 @@
-package com.innoad.controlador;
+package com.innoad.modules.content.controller;
 
 import com.innoad.dto.solicitud.SolicitudContenido;
 import com.innoad.dto.respuesta.RespuestaAPI;
 import com.innoad.dto.respuesta.RespuestaContenido;
 import com.innoad.modules.auth.domain.Usuario;
-import com.innoad.servicio.ServicioContenido;
+import com.innoad.modules.content.service.ServicioContenido;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

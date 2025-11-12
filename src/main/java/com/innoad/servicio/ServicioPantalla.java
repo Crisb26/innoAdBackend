@@ -5,7 +5,7 @@ import com.innoad.dto.respuesta.RespuestaPantalla;
 import com.innoad.modelo.entidades.Pantalla;
 import com.innoad.modules.auth.domain.Usuario;
 import com.innoad.modules.auth.service.ServicioJWT;
-import com.innoad.repositorio.RepositorioContenido;
+import com.innoad.modules.content.repository.RepositorioContenido;
 import com.innoad.repositorio.RepositorioPantalla;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

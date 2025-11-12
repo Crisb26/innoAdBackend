@@ -2,7 +2,7 @@ package com.innoad.controlador;
 
 import com.innoad.dto.respuesta.RespuestaAPI;
 import com.innoad.dto.respuesta.RespuestaContenido;
-import com.innoad.servicio.ServicioContenido;
+import com.innoad.modules.content.service.ServicioContenido;
 import com.innoad.servicio.ServicioPantalla;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

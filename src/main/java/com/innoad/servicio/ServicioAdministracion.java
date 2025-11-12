@@ -6,6 +6,8 @@ import com.innoad.dto.respuesta.RespuestaUsuarioAdmin;
 import com.innoad.modelo.entidades.Auditoria;
 import com.innoad.modules.auth.domain.Usuario;
 import com.innoad.modules.auth.repository.RepositorioUsuario;
+import com.innoad.modules.content.repository.RepositorioContenido;
+import com.innoad.modules.content.repository.RepositorioPublicidad;
 import com.innoad.modelo.enumeraciones.RolUsuario;
 import com.innoad.repositorio.*;
 import lombok.RequiredArgsConstructor;

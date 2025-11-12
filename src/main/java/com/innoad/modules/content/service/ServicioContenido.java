@@ -1,11 +1,11 @@
-package com.innoad.servicio;
+package com.innoad.modules.content.service;
 
 import com.innoad.dto.solicitud.SolicitudContenido;
 import com.innoad.dto.respuesta.RespuestaContenido;
-import com.innoad.modelo.entidades.Contenido;
+import com.innoad.modules.content.domain.Contenido;
 import com.innoad.modelo.entidades.Pantalla;
 import com.innoad.modules.auth.domain.Usuario;
-import com.innoad.repositorio.RepositorioContenido;
+import com.innoad.modules.content.repository.RepositorioContenido;
 import com.innoad.repositorio.RepositorioPantalla;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

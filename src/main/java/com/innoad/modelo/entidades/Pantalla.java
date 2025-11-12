@@ -1,6 +1,7 @@
 package com.innoad.modelo.entidades;
 
 import com.innoad.modules.auth.domain.Usuario;
+import com.innoad.modules.content.domain.Contenido;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
