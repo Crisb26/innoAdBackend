@@ -1,0 +1,104 @@
+version: '3.8'
+
+services:
+  # ========================================
+  # POSTGRESQL DATABASE
+  # ========================================
+  postgres:
+    image: postgres:16
+    container_name: innoad-postgres
+    environment:
+      POSTGRES_DB: innoad_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Cris930226**
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Script de inicialización (ejecuta solo la primera vez)
+      - ./init-database.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./DATABASE-SCRIPT.sql:/docker-entrypoint-initdb.d/02-data.sql
+    networks:
+      - innoad-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d innoad_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  # ========================================
+  # INNOAD BACKEND (Spring Boot)
+  # ========================================
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: innoad-backend:latest
+    container_name: innoad-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Server config
+      - SERVER_PORT=8080
+      - SPRING_PROFILES_ACTIVE=prod
+      
+      # Database (conecta al servicio 'postgres' en la red Docker)
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/innoad_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=Cris930226**
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+      
+      # JWT Security
+      - JWT_SECRET=${JWT_SECRET:-MiClaveSecretaSuperSeguraParaInnoAdQueDebeSerMuyLarga2024!}
+      - JWT_EXPIRATION=86400000
+      
+      # Email config (cambiar por tus credenciales reales)
+      - SPRING_MAIL_HOST=${MAIL_HOST:-smtp.gmail.com}
+      - SPRING_MAIL_PORT=${MAIL_PORT:-587}
+      - SPRING_MAIL_USERNAME=${MAIL_USERNAME:-tu-email@gmail.com}
+      - SPRING_MAIL_PASSWORD=${MAIL_PASSWORD:-tu-password-app}
+      
+      # Frontend URL (para CORS)
+      - INNOAD_FRONTEND_URL=${FRONTEND_URL:-http://localhost:4200}
+      
+      # Admin config
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-Admin123!}
+      
+      # Java opts
+      - JAVA_OPTS=-Xmx512m -Xms256m
+    ports:
+      - "8080:8080"
+    networks:
+      - innoad-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# ========================================
+# VOLUMES (persistencia de datos)
+# ========================================
+volumes:
+  postgres_data:
+    driver: local
+    name: innoad_postgres_data
+
+# ========================================
+# NETWORKS
+# ========================================
+networks:
+  innoad-network:
+    driver: bridge
+    name: innoad_network
