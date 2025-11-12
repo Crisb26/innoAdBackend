@@ -1,10 +1,10 @@
-package com.innoad.controlador;
+package com.innoad.modules.screens.controller;
 
 import com.innoad.dto.solicitud.SolicitudPantalla;
 import com.innoad.dto.respuesta.RespuestaAPI;
 import com.innoad.dto.respuesta.RespuestaPantalla;
 import com.innoad.modules.auth.domain.Usuario;
-import com.innoad.servicio.ServicioPantalla;
+import com.innoad.modules.screens.service.ServicioPantalla;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

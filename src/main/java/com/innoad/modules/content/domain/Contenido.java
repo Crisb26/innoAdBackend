@@ -1,7 +1,7 @@
 package com.innoad.modules.content.domain;
 
 import com.innoad.modules.auth.domain.Usuario;
-import com.innoad.modelo.entidades.Pantalla;
+import com.innoad.modules.screens.domain.Pantalla;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;

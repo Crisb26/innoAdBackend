@@ -1,4 +1,4 @@
-package com.innoad.modelo.entidades;
+package com.innoad.modules.screens.domain;
 
 import com.innoad.modules.auth.domain.Usuario;
 import com.innoad.modules.content.domain.Contenido;

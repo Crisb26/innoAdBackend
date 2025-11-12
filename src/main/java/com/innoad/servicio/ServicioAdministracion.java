@@ -8,6 +8,7 @@ import com.innoad.modules.auth.domain.Usuario;
 import com.innoad.modules.auth.repository.RepositorioUsuario;
 import com.innoad.modules.content.repository.RepositorioContenido;
 import com.innoad.modules.content.repository.RepositorioPublicidad;
+import com.innoad.modules.screens.repository.RepositorioPantalla;
 import com.innoad.modelo.enumeraciones.RolUsuario;
 import com.innoad.repositorio.*;
 import lombok.RequiredArgsConstructor;

@@ -1,9 +1,9 @@
-package com.innoad.controlador;
+package com.innoad.modules.screens.controller;
 
 import com.innoad.dto.respuesta.RespuestaAPI;
 import com.innoad.dto.respuesta.RespuestaContenido;
 import com.innoad.modules.content.service.ServicioContenido;
-import com.innoad.servicio.ServicioPantalla;
+import com.innoad.modules.screens.service.ServicioPantalla;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

@@ -1,12 +1,12 @@
-package com.innoad.servicio;
+package com.innoad.modules.screens.service;
 
 import com.innoad.dto.solicitud.SolicitudPantalla;
 import com.innoad.dto.respuesta.RespuestaPantalla;
-import com.innoad.modelo.entidades.Pantalla;
+import com.innoad.modules.screens.domain.Pantalla;
 import com.innoad.modules.auth.domain.Usuario;
 import com.innoad.modules.auth.service.ServicioJWT;
 import com.innoad.modules.content.repository.RepositorioContenido;
-import com.innoad.repositorio.RepositorioPantalla;
+import com.innoad.modules.screens.repository.RepositorioPantalla;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
