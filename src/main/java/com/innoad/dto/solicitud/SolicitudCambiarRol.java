@@ -1,6 +1,6 @@
 package com.innoad.dto.solicitud;
 
-import com.innoad.modelo.enumeraciones.RolUsuario;
+import com.innoad.shared.dto.RolUsuario;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -7,7 +7,7 @@ import com.innoad.dto.respuesta.RespuestaAutenticacion;
 import com.innoad.dto.respuesta.RespuestaAPI;
 import com.innoad.dto.respuesta.RespuestaLogin;
 import com.innoad.modules.auth.domain.Usuario;
-import com.innoad.modelo.enumeraciones.RolUsuario;
+import com.innoad.shared.dto.RolUsuario;
 import com.innoad.modules.auth.repository.RepositorioUsuario;
 import com.innoad.servicio.ServicioEmail;
 import lombok.RequiredArgsConstructor;

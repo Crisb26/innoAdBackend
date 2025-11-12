@@ -1,4 +1,4 @@
-package com.innoad.modelo.enumeraciones;
+package com.innoad.shared.dto;
 
 /**
  * Enumeración que define los roles disponibles en el sistema InnoAd.

@@ -9,7 +9,7 @@ import com.innoad.modules.auth.repository.RepositorioUsuario;
 import com.innoad.modules.content.repository.RepositorioContenido;
 import com.innoad.modules.content.repository.RepositorioPublicidad;
 import com.innoad.modules.screens.repository.RepositorioPantalla;
-import com.innoad.modelo.enumeraciones.RolUsuario;
+import com.innoad.shared.dto.RolUsuario;
 import com.innoad.modules.admin.repository.RepositorioAuditoria;
 import com.innoad.modules.ia.repository.RepositorioConversacionIA;
 import lombok.RequiredArgsConstructor;

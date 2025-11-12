@@ -1,6 +1,6 @@
 package com.innoad.modules.auth.domain;
 
-import com.innoad.modelo.enumeraciones.RolUsuario;
+import com.innoad.shared.dto.RolUsuario;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

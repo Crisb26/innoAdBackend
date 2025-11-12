@@ -1,6 +1,6 @@
 package com.innoad.dto.respuesta;
 
-import com.innoad.modelo.enumeraciones.RolUsuario;
+import com.innoad.shared.dto.RolUsuario;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

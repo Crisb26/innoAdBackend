@@ -1,7 +1,7 @@
 package com.innoad.shared.config;
 
 import com.innoad.modules.auth.domain.Usuario;
-import com.innoad.modelo.enumeraciones.RolUsuario;
+import com.innoad.shared.dto.RolUsuario;
 import com.innoad.modules.auth.repository.RepositorioUsuario;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
