@@ -35,6 +35,16 @@ public class FiltroAutenticacionJWT extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
         
+        // Log de la petición (útil para debugging)
+        String path = request.getRequestURI();
+        String method = request.getMethod();
+        
+        // Rutas públicas que no necesitan token JWT
+        if (esRutaPublica(path)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+        
         // Obtener el header de autorización
         final String authHeader = request.getHeader("Authorization");
         
@@ -72,10 +82,32 @@ public class FiltroAutenticacionJWT extends OncePerRequestFilter {
             }
         } catch (Exception e) {
             // Log del error (en producción usar un logger apropiado)
-            System.err.println("Error al procesar token JWT: " + e.getMessage());
+            System.err.println("❌ Error al procesar token JWT en " + method + " " + path + ": " + e.getMessage());
+            // Limpiar el contexto de seguridad en caso de error
+            SecurityContextHolder.clearContext();
         }
         
         // Continuar con la cadena de filtros
         filterChain.doFilter(request, response);
+    }
+    
+    /**
+     * Verifica si la ruta es pública y no requiere autenticación JWT
+     */
+    private boolean esRutaPublica(String path) {
+        return path.startsWith("/api/v1/auth/") ||
+               path.startsWith("/api/v1/autenticacion/") ||  // Alias por compatibilidad
+               path.startsWith("/api/autenticacion/") ||      // Alias legacy
+               path.startsWith("/api/v1/raspberry/") ||
+               path.startsWith("/swagger-ui") ||
+               path.startsWith("/v3/api-docs") ||
+               path.startsWith("/api-docs") ||
+               path.startsWith("/actuator") ||
+               path.startsWith("/h2-console") ||
+               path.startsWith("/uploads") ||
+               path.startsWith("/static") ||
+               path.equals("/error") ||
+               path.equals("/favicon.ico") ||
+               path.equals("/api/mantenimiento/estado");
     }
 }

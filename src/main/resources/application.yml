@@ -143,12 +143,14 @@ server:
 logging:
   level:
     root: INFO
-    com.innoad: INFO
-    org.springframework.web: WARN
-    org.springframework.security: WARN
+    com.innoad: DEBUG
+    com.innoad.shared.security: DEBUG
+    com.innoad.modules.auth: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
     org.hibernate.SQL: WARN
   pattern:
-    console: '%d{yyyy-MM-dd HH:mm:ss} - %msg%n'
+    console: '%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n'
 
 
 # Actuator endpoints para monitoreo

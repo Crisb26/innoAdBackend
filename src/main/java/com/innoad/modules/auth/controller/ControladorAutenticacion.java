@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/autenticacion")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 @CrossOrigin(origins = {"http://localhost:4200", "http://localhost:8080", "http://127.0.0.1:8080"})
 public class ControladorAutenticacion {
@@ -71,15 +71,45 @@ public class ControladorAutenticacion {
     }
     
     @PostMapping("/login")
-    public ResponseEntity<RespuestaAutenticacion> login(
+    public ResponseEntity<RespuestaAPI<RespuestaLogin>> login(
             @Valid @RequestBody SolicitudLogin solicitud
     ) {
         try {
-            RespuestaAutenticacion respuesta = servicioAutenticacion.autenticar(solicitud);
-            return ResponseEntity.ok(respuesta);
+            RespuestaAutenticacion respuestaAuth = servicioAutenticacion.autenticar(solicitud);
+            
+            // Construir rol simple
+            RespuestaLogin.RolSimple rolSimple = RespuestaLogin.RolSimple.builder()
+                    .nombre(respuestaAuth.getRol())
+                    .build();
+            
+            // Construir usuario DTO
+            RespuestaLogin.UsuarioLogin usuario = RespuestaLogin.UsuarioLogin.builder()
+                    .id(respuestaAuth.getId())
+                    .nombreUsuario(respuestaAuth.getNombreUsuario())
+                    .email(respuestaAuth.getEmail())
+                    .nombreCompleto(respuestaAuth.getNombreCompleto())
+                    .rol(rolSimple)
+                    .build();
+            
+            // Construir respuesta de login
+            RespuestaLogin respuestaLogin = RespuestaLogin.builder()
+                    .token(respuestaAuth.getToken())
+                    .tokenActualizacion("") // Por ahora vacío
+                    .usuario(usuario)
+                    .expiraEn(3600) // 1 hora en segundos
+                    .build();
+            
+            return ResponseEntity.ok(
+                    RespuestaAPI.<RespuestaLogin>builder()
+                            .exitoso(true)
+                            .mensaje(respuestaAuth.getMensaje())
+                            .datos(respuestaLogin)
+                            .build()
+            );
         } catch (Exception e) {
             return ResponseEntity.badRequest()
-                    .body(RespuestaAutenticacion.builder()
+                    .body(RespuestaAPI.<RespuestaLogin>builder()
+                            .exitoso(false)
                             .mensaje("Error al autenticar: " + e.getMessage())
                             .build());
         }
