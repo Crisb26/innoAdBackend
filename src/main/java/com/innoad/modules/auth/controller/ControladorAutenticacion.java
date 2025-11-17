@@ -1,5 +1,6 @@
 package com.innoad.modules.auth.controller;
 
+import com.innoad.dto.solicitud.SolicitudActualizarPerfil;
 import com.innoad.dto.solicitud.SolicitudLogin;
 import com.innoad.dto.solicitud.SolicitudRegistro;
 import com.innoad.dto.solicitud.SolicitudRegistroPublico;
@@ -77,9 +78,19 @@ public class ControladorAutenticacion {
         try {
             RespuestaAutenticacion respuestaAuth = servicioAutenticacion.autenticar(solicitud);
             
+            // Convertir enum RolUsuario a String
+            String rolNombre = switch (respuestaAuth.getRol()) {
+                case ADMINISTRADOR -> "Administrador";
+                case TECNICO -> "Técnico";
+                case DESARROLLADOR -> "Desarrollador";
+                case USUARIO -> "Usuario";
+                case VISITANTE -> "Visitante";
+                default -> "Usuario"; // Caso por defecto
+            };
+            
             // Construir rol simple
             RespuestaLogin.RolSimple rolSimple = RespuestaLogin.RolSimple.builder()
-                    .nombre(respuestaAuth.getRol())
+                    .nombre(rolNombre)
                     .build();
             
             // Construir usuario DTO
@@ -222,4 +233,29 @@ public class ControladorAutenticacion {
                                                 .build()
                 );
         }
+    
+    /**
+     * Actualizar perfil del usuario actual
+     */
+    @PutMapping("/perfil")
+    public ResponseEntity<RespuestaAPI<RespuestaLogin.UsuarioLogin>> actualizarPerfil(
+            @Valid @RequestBody SolicitudActualizarPerfil solicitud
+    ) {
+        try {
+            RespuestaLogin.UsuarioLogin usuarioActualizado = servicioAutenticacion.actualizarPerfil(solicitud);
+            return ResponseEntity.ok(
+                    RespuestaAPI.<RespuestaLogin.UsuarioLogin>builder()
+                            .exitoso(true)
+                            .mensaje("Perfil actualizado correctamente")
+                            .datos(usuarioActualizado)
+                            .build()
+            );
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(RespuestaAPI.<RespuestaLogin.UsuarioLogin>builder()
+                            .exitoso(false)
+                            .mensaje("Error al actualizar perfil: " + e.getMessage())
+                            .build());
+        }
+    }
 }
