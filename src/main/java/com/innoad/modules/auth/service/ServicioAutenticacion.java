@@ -12,6 +12,7 @@ import com.innoad.shared.dto.RolUsuario;
 import com.innoad.modules.auth.repository.RepositorioUsuario;
 import com.innoad.servicio.ServicioEmail;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,6 +27,7 @@ import java.util.UUID;
 /**
  * Servicio de autenticación para registro, login y recuperación de contraseña.
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ServicioAutenticacion {
