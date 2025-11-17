@@ -43,6 +43,11 @@ public class SolicitudRegistroPublico {
              message = "La contraseña debe contener al menos una mayúscula, una minúscula, un número y un carácter especial")
     private String contrasena;
 
+    @NotBlank(message = "La cédula es obligatoria")
+    @Size(min = 5, max = 20, message = "La cédula debe tener entre 5 y 20 caracteres")
+    @Pattern(regexp = "^[0-9]+$", message = "La cédula solo puede contener números")
+    private String cedula;
+
     @Size(max = 20, message = "El teléfono no puede exceder 20 caracteres")
     private String telefono;
 

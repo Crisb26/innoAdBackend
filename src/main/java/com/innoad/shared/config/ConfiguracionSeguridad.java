@@ -135,12 +135,15 @@ public class ConfiguracionSeguridad {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
-        // Permitir cualquier puerto localhost en desarrollo
+        // Orígenes permitidos (desarrollo y producción)
         configuration.setAllowedOriginPatterns(Arrays.asList(
-                "http://localhost:*",
-                "http://127.0.0.1:*",
-                "https://innoad.com",
-                "https://www.innoad.com"
+                "http://localhost:*",           // Desarrollo local (cualquier puerto)
+                "http://127.0.0.1:*",          // Desarrollo local IP
+                "https://innoad.com",           // Dominio producción
+                "https://www.innoad.com",       // Dominio producción con www
+                "https://*.vercel.app",         // Vercel deployment
+                "https://*.netlify.app",        // Netlify deployment
+                "https://*.railway.app"         // Railway frontend (opcional)
         ));
         
         // Métodos HTTP permitidos
@@ -155,13 +158,15 @@ public class ConfiguracionSeguridad {
                 "Accept",
                 "X-Requested-With",
                 "Cache-Control",
-                "Origin"
+                "Origin",
+                "X-Auth-Token"
         ));
         
         // Headers expuestos al cliente
         configuration.setExposedHeaders(Arrays.asList(
                 "Authorization",
-                "Content-Disposition"
+                "Content-Disposition",
+                "X-Total-Count"
         ));
         
         // Permitir credenciales (cookies, authorization headers)

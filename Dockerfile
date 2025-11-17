@@ -9,8 +9,12 @@ WORKDIR /workspace
 COPY pom.xml ./
 COPY src ./src
 
-# Build the application (skip tests to speed up CI builds; change if you want tests)
-RUN mvn -B -DskipTests package -DskipITs -U
+# Build the application with limited memory usage and no update checks
+# -XX:MaxRAMPercentage=80.0 limits heap to 80% of container memory
+RUN mvn -B -DskipTests package -DskipITs --no-transfer-progress \
+    -Dmaven.compiler.fork=true \
+    -Dmaven.compiler.meminitial=128m \
+    -Dmaven.compiler.maxmem=512m
 
 FROM eclipse-temurin:21-jre-jammy
 

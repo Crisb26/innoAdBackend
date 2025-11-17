@@ -81,8 +81,6 @@ public class FiltroAutenticacionJWT extends OncePerRequestFilter {
                 }
             }
         } catch (Exception e) {
-            // Log del error (en producción usar un logger apropiado)
-            System.err.println("❌ Error al procesar token JWT en " + method + " " + path + ": " + e.getMessage());
             // Limpiar el contexto de seguridad en caso de error
             SecurityContextHolder.clearContext();
         }

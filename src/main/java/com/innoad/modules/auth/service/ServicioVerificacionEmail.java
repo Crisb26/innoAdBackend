@@ -55,17 +55,6 @@ public class ServicioVerificacionEmail {
 
             log.info("Email de verificación enviado a: {} con URL: {}", usuario.getEmail(), urlVerificacion);
 
-            // Temporalmente loggeamos la URL para desarrollo
-            System.out.println("\n" + "=".repeat(80));
-            System.out.println("EMAIL DE VERIFICACIÓN");
-            System.out.println("=".repeat(80));
-            System.out.println("Para: " + usuario.getEmail());
-            System.out.println("Nombre: " + usuario.getNombre() + " " + usuario.getApellido());
-            System.out.println("\nPor favor verifica tu cuenta haciendo clic en el siguiente enlace:");
-            System.out.println(urlVerificacion);
-            System.out.println("\nEste enlace expira en 24 horas.");
-            System.out.println("=".repeat(80) + "\n");
-
         } catch (Exception e) {
             log.error("Error al enviar email de verificación a {}: {}", usuario.getEmail(), e.getMessage());
         }

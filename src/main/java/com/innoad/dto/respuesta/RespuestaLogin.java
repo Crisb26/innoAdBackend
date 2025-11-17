@@ -26,6 +26,10 @@ public class RespuestaLogin {
         private String nombreUsuario;
         private String email;
         private String nombreCompleto;
+        private String telefono;
+        private String direccion;
+        private String cedula;
+        private String avatarUrl;
         private RolSimple rol;
         @Builder.Default
         private List<PermisoSimple> permisos = List.of();

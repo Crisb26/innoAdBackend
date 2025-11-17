@@ -1,5 +1,6 @@
 package com.innoad.modules.auth.service;
 
+import com.innoad.dto.solicitud.SolicitudActualizarPerfil;
 import com.innoad.dto.solicitud.SolicitudLogin;
 import com.innoad.dto.solicitud.SolicitudRegistro;
 import com.innoad.dto.solicitud.SolicitudRegistroPublico;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -88,8 +90,7 @@ public class ServicioAutenticacion {
         try {
             servicioEmail.enviarEmailVerificacion(usuario.getEmail(), tokenVerificacion);
         } catch (Exception e) {
-            // Log error pero no fallar el registro
-            System.err.println("Error al enviar email de verificación: " + e.getMessage());
+            log.error("Error al enviar email de verificación: {}", e.getMessage());
         }
         
         // Generar JWT
@@ -137,6 +138,7 @@ public class ServicioAutenticacion {
                 .nombreUsuario(solicitud.getNombreUsuario())
                 .contrasena(passwordEncoder.encode(solicitud.getContrasena()))
                 .rol(RolUsuario.USUARIO) // Siempre USUARIO en registro público
+                .cedula(solicitud.getCedula())
                 .telefono(solicitud.getTelefono())
                 .empresa(solicitud.getEmpresa())
                 .cargo(solicitud.getCargo())
@@ -157,8 +159,7 @@ public class ServicioAutenticacion {
         try {
             servicioEmail.enviarEmailVerificacion(usuario.getEmail(), tokenVerificacion);
         } catch (Exception e) {
-            // Log error pero no fallar el registro
-            System.err.println("Error al enviar email de verificación: " + e.getMessage());
+            log.error("Error al enviar email de verificación: {}", e.getMessage());
         }
 
         // Generar JWT
@@ -339,6 +340,10 @@ public class ServicioAutenticacion {
                 .nombreUsuario(usuario.getNombreUsuario())
                 .email(usuario.getEmail())
                 .nombreCompleto(usuario.getNombreCompleto())
+                .telefono(usuario.getTelefono())
+                .direccion(usuario.getDireccion())
+                .cedula(usuario.getCedula())
+                .avatarUrl(usuario.getFotoPerfil())
                 .rol(RespuestaLogin.RolSimple.builder().nombre(rolNombre).build())
                 .build();
 
@@ -385,6 +390,10 @@ public class ServicioAutenticacion {
                 .nombreUsuario(usuario.getNombreUsuario())
                 .email(usuario.getEmail())
                 .nombreCompleto(usuario.getNombreCompleto())
+                .telefono(usuario.getTelefono())
+                .direccion(usuario.getDireccion())
+                .cedula(usuario.getCedula())
+                .avatarUrl(usuario.getFotoPerfil())
                 .rol(RespuestaLogin.RolSimple.builder().nombre(rolNombre).build())
                 .build();
 
@@ -399,6 +408,65 @@ public class ServicioAutenticacion {
                 .exitoso(true)
                 .mensaje("Token renovado")
                 .datos(respuestaLogin)
+                .build();
+    }
+    
+    /**
+     * Actualiza el perfil del usuario actual
+     */
+    @Transactional
+    public RespuestaLogin.UsuarioLogin actualizarPerfil(SolicitudActualizarPerfil solicitud) {
+        // Obtener el usuario actual del contexto de seguridad
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        
+        Usuario usuario = repositorioUsuario.findByNombreUsuario(username)
+                .or(() -> repositorioUsuario.findByEmail(username))
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        
+        // Actualizar campos si están presentes
+        if (solicitud.getEmail() != null && !solicitud.getEmail().isBlank()) {
+            // Verificar que el email no esté en uso por otro usuario
+            if (!solicitud.getEmail().equals(usuario.getEmail()) && 
+                repositorioUsuario.existsByEmail(solicitud.getEmail())) {
+                throw new RuntimeException("El email ya está en uso por otro usuario");
+            }
+            usuario.setEmail(solicitud.getEmail());
+        }
+        
+        if (solicitud.getTelefono() != null) {
+            usuario.setTelefono(solicitud.getTelefono().isBlank() ? null : solicitud.getTelefono());
+        }
+        
+        if (solicitud.getDireccion() != null) {
+            usuario.setDireccion(solicitud.getDireccion().isBlank() ? null : solicitud.getDireccion());
+        }
+        
+        if (solicitud.getAvatarUrl() != null) {
+            usuario.setFotoPerfil(solicitud.getAvatarUrl().isBlank() ? null : solicitud.getAvatarUrl());
+        }
+        
+        // Guardar cambios
+        usuario = repositorioUsuario.save(usuario);
+        
+        // Construir respuesta
+        var rolNombre = switch (usuario.getRol()) {
+            case ADMINISTRADOR -> "Administrador";
+            case TECNICO -> "Técnico";
+            case DESARROLLADOR -> "Desarrollador";
+            case USUARIO -> "Usuario";
+            case VISITANTE -> "Visitante";
+        };
+        
+        return RespuestaLogin.UsuarioLogin.builder()
+                .id(usuario.getId())
+                .nombreUsuario(usuario.getNombreUsuario())
+                .email(usuario.getEmail())
+                .nombreCompleto(usuario.getNombreCompleto())
+                .telefono(usuario.getTelefono())
+                .direccion(usuario.getDireccion())
+                .cedula(usuario.getCedula())
+                .avatarUrl(usuario.getFotoPerfil())
+                .rol(RespuestaLogin.RolSimple.builder().nombre(rolNombre).build())
                 .build();
     }
 }

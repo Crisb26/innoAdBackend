@@ -65,6 +65,9 @@ public class Usuario implements UserDetails {
     private String telefono;
     
     @Column(length = 200)
+    private String direccion;
+    
+    @Column(length = 200)
     private String empresa;
     
     @Column(length = 100)
@@ -73,6 +76,9 @@ public class Usuario implements UserDetails {
     @Lob
     @Column(columnDefinition = "TEXT")
     private String fotoPerfil; // URL o Base64
+    
+    @Column(length = 20)
+    private String cedula;
     
     @Builder.Default
     @Column(nullable = false)

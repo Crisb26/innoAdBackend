@@ -1,20 +1,71 @@
-# Configuración para entorno de producción
+# Configuración para entorno de producción (Railway/Azure/Cloud)
 spring:
   datasource:
-    url: ${DB_URL}
+    # Railway PostgreSQL proporciona DATABASE_URL con formato: postgresql://user:pass@host:port/dbname
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/innoad_db}
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:}
+    hikari:
+      connection-timeout: 20000
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 300000
+      max-lifetime: 1200000
+  
   jpa:
     show-sql: false
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 20
+        format_sql: false
+  
+  # Configuración de correo (usar variables de entorno)
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+  
+  # Redis opcional en producción
+  data:
+    redis:
+      host: ${REDIS_HOST:}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+
+# Logging optimizado para producción
 logging:
   level:
     root: WARN
     com.innoad: INFO
+    org.springframework.web: WARN
+    org.hibernate: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
 
-# En producción, habilitar los health indicators si están configurados
+# Actuator para health checks
 management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
   health:
     mail:
-      enabled: true
+      enabled: false
     redis:
-      enabled: true
+      enabled: false
+
+# Server configuration
+server:
+  port: ${PORT:8080}
+  compression:
+    enabled: true
+  error:
+    include-message: always
+    include-stacktrace: never
