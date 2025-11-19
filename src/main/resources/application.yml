@@ -6,10 +6,12 @@ spring:
   
   # ===== CONFIGURACION POSTGRESQL DATABASE =====
   datasource:
+    # Railway puede inyectar DATABASE_URL directamente. Ajusta para usarlo si existe.
     url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/innoad_db}
     driver-class-name: org.postgresql.Driver
+    # Evitar credenciales sensibles hardcodeadas. Usa variables de entorno en Railway.
     username: ${DATABASE_USERNAME:postgres}
-    password: ${DATABASE_PASSWORD:Cris930226**}
+    password: ${DATABASE_PASSWORD:}
     hikari:
       connection-timeout: 30000
       maximum-pool-size: 100
@@ -49,12 +51,12 @@ spring:
           writetimeout: 5000
   
   # Configuración de Redis para caché
-  data:
-    redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:}
-      timeout: 60000ms
+    data:
+      redis:
+        host: ${REDIS_HOST:innoad-redis}
+        port: ${REDIS_PORT:6379}
+        password: ${REDIS_PASSWORD:}
+        timeout: 60000ms
   
   # Configuración de caché
   cache:
@@ -120,7 +122,8 @@ innoad:
 
 # Configuracion de servidor
 server:
-  port: ${SERVER_PORT:8080}
+  # Prioriza PORT (Railway) luego SERVER_PORT y por último 8080.
+  port: ${PORT:${SERVER_PORT:8080}}
   tomcat:
     threads:
       max: 400

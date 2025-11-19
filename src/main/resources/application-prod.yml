@@ -29,12 +29,13 @@ spring:
     username: ${MAIL_USERNAME:}
     password: ${MAIL_PASSWORD:}
   
-  # Redis opcional en producción
+  # Redis para producción y Docker
   data:
     redis:
-      host: ${REDIS_HOST:}
+      host: ${REDIS_HOST:innoad-redis}
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:}
+      timeout: 60000ms
 
 # Logging optimizado para producción
 logging:
