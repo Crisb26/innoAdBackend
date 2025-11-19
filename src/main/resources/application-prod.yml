@@ -1,10 +1,11 @@
 # Configuración para entorno de producción (Railway/Azure/Cloud)
 spring:
   datasource:
-    # Railway PostgreSQL proporciona DATABASE_URL con formato: postgresql://user:pass@host:port/dbname
-    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/innoad_db}
-    username: ${DATABASE_USERNAME:postgres}
-    password: ${DATABASE_PASSWORD:}
+    # Usa DATABASE_URL si está disponible, si no, construye con variables Railway
+    url: ${DATABASE_URL:jdbc:postgresql://${PGHOST:localhost}:${PGPORT:5432}/${PGDATABASE:railway}}
+    username: ${PGUSER:postgres}
+    password: ${PGPASSWORD:}
+    driver-class-name: org.postgresql.Driver
     hikari:
       connection-timeout: 20000
       maximum-pool-size: 10
@@ -32,10 +33,10 @@ spring:
   # Redis para producción y Docker
   data:
     redis:
-      host: ${REDIS_HOST:innoad-redis}
-      port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:}
-      timeout: 60000ms
+        host: ${REDIS_HOST:redis.internal}
+        port: ${REDIS_PORT:6379}
+        password: ${REDIS_PASSWORD:}
+        timeout: 60000ms
 
 # Logging optimizado para producción
 logging:
