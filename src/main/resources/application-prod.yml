@@ -65,7 +65,7 @@ management:
 
 # Server configuration
 server:
-  port: ${PORT:8080}
+  port: ${PORT:80}
   compression:
     enabled: true
   error:
