@@ -1,10 +1,10 @@
-# Configuración para entorno de producción (Railway/Azure/Cloud)
+# Configuración para entorno de producción (Azure PostgreSQL)
 spring:
   datasource:
-    # Usa DATABASE_URL si está disponible, si no, construye con variables Railway
-    url: ${DATABASE_URL:jdbc:postgresql://${PGHOST:localhost}:${PGPORT:5432}/${PGDATABASE:railway}}
-    username: ${PGUSER:postgres}
-    password: ${PGPASSWORD:}
+    # Usa las variables de Azure PostgreSQL
+    url: jdbc:postgresql://${AZURE_DB_HOST:innoad-postgres.postgres.database.azure.com}:${AZURE_DB_PORT:5432}/${AZURE_DB_NAME:innoad_db}?sslmode=require
+    username: ${AZURE_DB_USER:admininnoad}
+    password: ${AZURE_DB_PASSWORD:}
     driver-class-name: org.postgresql.Driver
     hikari:
       connection-timeout: 20000

@@ -4,67 +4,80 @@ API REST para gestión de campañas publicitarias digitales con pantallas inteli
 
 ## 🛠️ Stack Tecnológico
 
-- **Framework**: Spring Boot 3.5.7
+- **Framework**: Spring Boot 2.0.0
 - **Lenguaje**: Java 21
-- **Base de Datos**: PostgreSQL 18.0
+- **Base de Datos**: PostgreSQL 17.6 (Azure)
 - **Build**: Maven 3.9.11
 - **Seguridad**: Spring Security + JWT
 - **Contenedores**: Docker
+- **Cloud**: Microsoft Azure PostgreSQL
 
 ## 📋 Requisitos
 
 - Java JDK 21+
 - Maven 3.9.11+
-- PostgreSQL 18.0+ (o Railway PostgreSQL)
-- Docker (opcional)
+- PostgreSQL Client 18.0+ (para desarrollo local)
+- Docker (para containerización)
+- Credenciales Azure (ver `secure/vault.enc.aes`)
 
 ## 🚀 Inicio Rápido
 
-### Desarrollo Local
+### Compilación
 
 ```bash
-# 1. Configurar variables de entorno
-cp .env.example .env
-# Editar .env con tus credenciales
-
-# 2. Compilar
+# Compilar sin tests
 mvn clean package -DskipTests
 
-# 3. Ejecutar
-java -jar target/innoad-backend-2.0.0.jar
+# El JAR se genera en: target/innoad-backend-2.0.0.jar
 ```
-
-**API disponible en**: http://localhost:8080
 
 ### Con Docker
 
 ```bash
-docker-compose up -d --build
+# Construir imagen
+docker build -t innoad-backend:latest .
+
+# Ejecutar contenedor
+docker run -p 8080:8080 innoad-backend:latest
 ```
 
-## ☁️ Despliegue en Railway
+## ☁️ Despliegue en Azure
 
-Ver guía completa: [DEPLOY.md](DEPLOY.md)
+### Credenciales y Configuración
 
-### Pasos Rápidos:
+**Las credenciales están encriptadas en**: `secure/vault.enc.aes`
 
-1. **Crear PostgreSQL en Railway**
-   - New Project → Provision PostgreSQL
-   - Copiar `DATABASE_URL`
+**Para desencriptar** (solo para ver, no commitear):
+```bash
+openssl enc -d -aes-256-cbc -in secure/vault.enc.aes -k 'Cris930226**'
+```
 
-2. **Desplegar Backend**
-   - Deploy from GitHub
-   - Configurar variables de entorno (ver `.env.example`)
-   - Railway detectará el `Dockerfile` automáticamente
+### Pasos de Despliegue
 
-3. **Variables de Entorno Requeridas**:
+1. **Construir y taggear imagen**
+   ```bash
+   docker build -t innoad-backend:latest .
+   docker tag innoad-backend:latest InnoAdRegistry.azurecr.io/innoad-backend:latest
    ```
-   DATABASE_URL=postgresql://...
-   JWT_SECRET=tu-secreto
-   SPRING_PROFILES_ACTIVE=prod
-   MAIL_USERNAME=tu-email@gmail.com
-   MAIL_PASSWORD=tu-app-password
+
+2. **Autenticarse en Azure Container Registry**
+   ```bash
+   az login
+   az acr login --name InnoAdRegistry
    ```
+
+3. **Pushear imagen**
+   ```bash
+   docker push InnoAdRegistry.azurecr.io/innoad-backend:latest
+   ```
+
+4. **Actualizar Container App**
+   ```bash
+   az containerapp update --name innoad-backend --resource-group innoad-rg \
+     --image InnoAdRegistry.azurecr.io/innoad-backend:latest
+   ```
+
+**Ver guía detallada**: [INSTRUCCIONES_KEVIN_DOCKER.md](../INSTRUCCIONES_KEVIN_DOCKER.md)
 
 ## 📁 Estructura del Proyecto
 
@@ -112,29 +125,37 @@ src/main/java/com/innoad/
 
 ## 🔧 Configuración
 
-### Perfiles
+### Perfiles de Ambiente
 
-- **dev**: Desarrollo local
-- **prod**: Producción
+- **dev**: Desarrollo local con PostgreSQL local
+- **prod**: Producción con Azure PostgreSQL
 
-```bash
-# Cambiar perfil
-java -jar app.jar --spring.profiles.active=prod
-```
+**Aplicado automáticamente** via `application-prod.yml` en deployment.
 
 ### Base de Datos
 
 **Desarrollo**:
 ```yaml
+# application-dev.yml
 url: jdbc:postgresql://localhost:5432/innoad_db
 username: postgres
 password: tu-password
 ```
 
-**Producción (Railway)**:
+**Producción (Azure)**:
 ```yaml
-url: ${DATABASE_URL}
+# application-prod.yml (Variables de entorno)
+url: jdbc:postgresql://${AZURE_DB_HOST}:${AZURE_DB_PORT}/${AZURE_DB_NAME}?sslmode=require
+username: ${AZURE_DB_USER}
+password: ${AZURE_DB_PASSWORD}
 ```
+
+**Base de Datos Azure**
+- Host: `innoad-postgres.postgres.database.azure.com`
+- Puerto: `5432`
+- Base de datos: `innoad_db`
+- Tablas: 53 creadas y funcionando ✅
+- SSL: Requerido obligatoriamente
 
 ## 🧪 Testing
 

@@ -48,11 +48,12 @@ logs/
 run-log.txt
 run-err.txt
 
-# Environment variables
+# Environment variables (keep secure/ vault)
 .env
 .env.local
 .env.production
 secrets.properties
+vault_temp.txt
 
 # Docker (keep configs)
 # .dockerignore
@@ -73,6 +74,8 @@ target/dependency-check-data/
 *~
 *.swp
 *.swo
+sql_scripts/
+temp/
 
 # Documentation (keep README.md)
 HELP.md  
