@@ -2,26 +2,32 @@
 spring:
   datasource:
     # Usa las variables de Azure PostgreSQL
-    url: jdbc:postgresql://${AZURE_DB_HOST:innoad-postgres.postgres.database.azure.com}:${AZURE_DB_PORT:5432}/${AZURE_DB_NAME:innoad_db}?sslmode=require
+    url: jdbc:postgresql://${AZURE_DB_HOST:innoad-postgres.postgres.database.azure.com}:${AZURE_DB_PORT:5432}/${AZURE_DB_NAME:innoad_db}?sslmode=require&connectTimeout=30&socketTimeout=0&tcpKeepAlive=true
     username: ${AZURE_DB_USER:admininnoad}
     password: ${AZURE_DB_PASSWORD:}
     driver-class-name: org.postgresql.Driver
     hikari:
-      connection-timeout: 20000
-      maximum-pool-size: 10
-      minimum-idle: 5
-      idle-timeout: 300000
-      max-lifetime: 1200000
+      connection-timeout: 60000
+      maximum-pool-size: 5
+      minimum-idle: 2
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      connection-test-query: SELECT 1
+      leak-detection-threshold: 60000
   
   jpa:
     show-sql: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
         jdbc:
           batch_size: 20
+          time_zone: UTC
         format_sql: false
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        temp:
+          use_jdbc_metadata_defaults: false
   
   # Configuración de correo (usar variables de entorno)
   mail:
