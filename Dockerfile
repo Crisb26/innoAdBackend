@@ -33,7 +33,10 @@ COPY --from=build /workspace/target/innoad-backend-2.0.0.jar /app/innoad-backend
 
 ENV JAVA_OPTS=""
 
-ENTRYPOINT ["sh","-c","java $JAVA_OPTS -jar /app/innoad-backend.jar"]
+# Asegurar que Spring use el perfil prod si está definida la variable
+ENV SPRING_PROFILES_ACTIVE=prod
+
+ENTRYPOINT ["sh","-c","java $JAVA_OPTS -Dspring.profiles.active=${SPRING_PROFILES_ACTIVE:-prod} -jar /app/innoad-backend.jar"]
 
 # Simple healthcheck using actuator endpoint
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
