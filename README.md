@@ -35,89 +35,57 @@ mvn clean package -DskipTests
 
 ```bash
 # Construir imagen
-docker build -t innoad-backend:latest .
+# InnoAd Backend 🚀
 
-# Ejecutar contenedor
-docker run -p 8080:8080 innoad-backend:latest
-```
+API REST para gestión de campañas publicitarias con autenticación JWT y PostgreSQL.
 
-## ☁️ Despliegue en Azure
+## 🛠️ Stack
 
-### Credenciales y Configuración
+- **Spring Boot**: 3.5.7
+- **Java**: 17
+- **DB**: PostgreSQL 17.6 (Azure Flexible Server)
+- **Build**: Maven 3.9.x
+- **Seguridad**: Spring Security + JWT
+- **Infra prod**: Azure Container Apps + Azure DB for PostgreSQL
 
-**Las credenciales están encriptadas en**: `secure/vault.enc.aes`
+## 🔧 Requisitos local
 
-**Para desencriptar** (solo para ver, no commitear):
+- Java 17
+- Maven 3.9+
+- PostgreSQL client (opcional para probar conexión)
+
+## 🚀 Arranque rápido (local)
+
 ```bash
-openssl enc -d -aes-256-cbc -in secure/vault.enc.aes -k 'Cris930226**'
+# Compilar sin tests
+mvn clean package -DskipTests
+
+# Ejecutar en perfil dev (usa application-dev.yml)
+- `POST /api/contenidos` - Subir contenido
 ```
 
-### Pasos de Despliegue
+### Variables clave (prod/dev)
 
-1. **Construir y taggear imagen**
-   ```bash
-   docker build -t innoad-backend:latest .
-   docker tag innoad-backend:latest InnoAdRegistry.azurecr.io/innoad-backend:latest
-   ```
+- `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_SSL_MODE`
+- `SPRING_JPA_HIBERNATE_DDL-AUTO=update`
+- `JWT_SECRET` (Base64 válido; ya corregido en Azure)
+- `INNOAD_FRONTEND_URL` para CORS
 
-2. **Autenticarse en Azure Container Registry**
-   ```bash
-   az login
-   az acr login --name InnoAdRegistry
-   ```
+## ☁️ Producción (Azure)
 
-3. **Pushear imagen**
-   ```bash
-   docker push InnoAdRegistry.azurecr.io/innoad-backend:latest
-   ```
+- Imagen activa: `kevinburgos0412/innoad-backend:v2.0.4` (Container Apps)
+- URL: `https://innoad-backend.wonderfuldune-d0f51e2f.eastus2.azurecontainerapps.io`
+- Health: `/actuator/health`
+- DDL auto: `update` (sincroniza esquema con columnas nuevas)
 
-4. **Actualizar Container App**
-   ```bash
-   az containerapp update --name innoad-backend --resource-group innoad-rg \
-     --image InnoAdRegistry.azurecr.io/innoad-backend:latest
-   ```
+## 🆕 Cambios recientes
 
-**Ver guía detallada**: [INSTRUCCIONES_KEVIN_DOCKER.md](../INSTRUCCIONES_KEVIN_DOCKER.md)
+- Se limpió documentación legacy y logs del repo.
+- `JWT_SECRET` ahora es Base64 válido para evitar `Illegal base64 character` en login.
+- Esquema de `usuarios` alineado (columnas añadidas, constraint `password` relajada).
+- Frontend apunta al Container App en Azure.
 
 ## 📁 Estructura del Proyecto
-
-```
-src/main/java/com/innoad/
-├── configuracion/       # Configuración (CORS, Security, JWT)
-├── modules/
-│   ├── auth/           # Autenticación y usuarios
-│   ├── campaigns/      # Gestión de campañas
-│   ├── content/        # Contenido multimedia
-│   ├── screens/        # Pantallas digitales
-│   ├── ia/             # Asistente IA
-│   └── reports/        # Reportes y estadísticas
-└── shared/             # Utilidades compartidas
-```
-
-## 🔐 Seguridad
-
-- JWT para autenticación
-- Roles: Administrador, Editor, Usuario
-- Encriptación BCrypt
-- CORS configurado
-
-## 📝 Endpoints Principales
-
-### Autenticación
-- `POST /api/auth/registrarse` - Registro
-- `POST /api/auth/iniciar-sesion` - Login
-- `GET /api/auth/perfil` - Perfil usuario
-- `PUT /api/auth/perfil` - Actualizar perfil
-
-### Campañas
-- `GET /api/campanias` - Listar campañas
-- `POST /api/campanias` - Crear campaña
-- `PUT /api/campanias/{id}` - Actualizar
-- `DELETE /api/campanias/{id}` - Eliminar
-
-### Contenidos
-- `GET /api/contenidos` - Listar contenidos
-- `POST /api/contenidos` - Subir contenido
 - `DELETE /api/contenidos/{id}` - Eliminar
 
 ### IA Asistente
