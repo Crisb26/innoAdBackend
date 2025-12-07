@@ -78,7 +78,7 @@ spring:
 
 # Configuración de JWT
 jwt:
-  secret: ${JWT_SECRET:MiClaveSecretaSuperSeguraParaInnoAdQueDebeSerMuyLarga2024!}
+  secret: ${JWT_SECRET:TWlDbGF2ZVNlY3JldGFTdXBlclNlZ3VyYVBhcmFJbm5vQWRRdWVEZWJlU2VyTXV5TGFyZ2EyMDI0ITM0ZGFlZmM0MTY2NzQ1YWVhMWM4MWY3N2MzMGIwYTNj}
   expiration: 86400000 # 24 horas en milisegundos
   refresh-expiration: 604800000 # 7 días
 
