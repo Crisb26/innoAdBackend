@@ -1,82 +1,149 @@
 # InnoAd Backend 🚀
 
-API REST para gestión de campañas publicitarias digitales con pantallas inteligentes e IA integrada.
+API REST para gestión de campañas publicitarias con autenticación JWT, IA integrada y pantallas digitales.
 
 ## 🛠️ Stack Tecnológico
 
-- **Framework**: Spring Boot 2.0.0
-- **Lenguaje**: Java 21
-- **Base de Datos**: PostgreSQL 17.6 (Azure)
-- **Build**: Maven 3.9.11
-- **Seguridad**: Spring Security + JWT
-- **Contenedores**: Docker
-- **Cloud**: Microsoft Azure PostgreSQL
+| Componente | Versión |
+|-----------|---------|
+| Spring Boot | 3.5.8 |
+| Java | 21 |
+| PostgreSQL | 17.6 (Azure) |
+| Maven | 3.9.x |
+| Seguridad | Spring Security + JWT |
 
 ## 📋 Requisitos
 
-- Java JDK 21+
-- Maven 3.9.11+
-- PostgreSQL Client 18.0+ (para desarrollo local)
-- Docker (para containerización)
-- Credenciales Azure (ver `secure/vault.enc.aes`)
+- **Java 21+**
+- **Maven 3.9+**
+- **Git**
 
-## 🚀 Inicio Rápido
-
-### Compilación
+## 🚀 Instalación
 
 ```bash
-# Compilar sin tests
-mvn clean package -DskipTests
+# 1. Clonar/extraer proyecto
+git clone <repo>
+cd innoadBackend
 
-# El JAR se genera en: target/innoad-backend-2.0.0.jar
+# 2. Compilar
+mvn clean compile
+
+# 3. Ver estructura
+ls -la src/main/java/com/innoad/modules/
 ```
 
-### Con Docker
+## 🏃 Ejecución Local
+
+```bash
+# Perfil desarrollo (H2 en memoria)
+mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=dev"
+
+# Perfil producción (PostgreSQL Azure)
+mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=prod"
+```
+
+**Backend disponible en**: http://localhost:8080
+
+## 📚 Módulos Principales
+
+```
+src/main/java/com/innoad/modules/
+├── admin/              # Control de mantenimiento y seguridad
+├── campanas/           # Gestión de campañas
+├── contenidos/         # Almacenamiento de multimedia
+├── pantallas/          # Gestión de pantallas digitales
+├── usuarios/           # Gestión de usuarios y roles
+├── reportes/           # Estadísticas y reportes
+├── chat/               # Sistema de chat con IA
+└── utils/              # Utilidades compartidas
+```
+
+## 🔐 Seguridad
+
+- **Autenticación**: JWT (tokens)
+- **Autorización**: Control de roles (ADMIN, USUARIO, VISITANTE, etc.)
+- **Base Datos**: Credenciales en variables de entorno
+- **Modo Mantenimiento**: Sistema profesional de control de acceso
+
+## 📡 Endpoints Principales
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| POST | `/api/auth/login` | Autenticación |
+| GET | `/api/campanas` | Listar campañas |
+| POST | `/api/campanas` | Crear campaña |
+| GET | `/api/pantallas` | Listar pantallas |
+| POST | `/api/admin/mantenimiento/activar` | Activar modo mantenimiento |
+| GET | `/api/admin/mantenimiento/estado` | Estado del sistema |
+
+## 🗄️ Base de Datos
+
+### Entornos
+
+- **DEV**: H2 en memoria (sin configuración)
+- **PROD**: PostgreSQL 17.6 en Azure Flexible Server
+
+### Conexión
+
+Las credenciales se cargan desde variables de entorno:
+
+```
+DB_HOST=servidor.postgres.database.azure.com
+DB_PORT=5432
+DB_NAME=innoad
+DB_USER=usuario
+DB_PASSWORD=contraseña
+```
+
+## 🐳 Docker
 
 ```bash
 # Construir imagen
-# InnoAd Backend 🚀
+docker build -t innoad-backend:latest .
 
-API REST para gestión de campañas publicitarias con autenticación JWT y PostgreSQL.
-
-## 🛠️ Stack
-
-- **Spring Boot**: 3.5.7
-- **Java**: 17
-- **DB**: PostgreSQL 17.6 (Azure Flexible Server)
-- **Build**: Maven 3.9.x
-- **Seguridad**: Spring Security + JWT
-- **Infra prod**: Azure Container Apps + Azure DB for PostgreSQL
-
-## 🔧 Requisitos local
-
-- Java 17
-- Maven 3.9+
-- PostgreSQL client (opcional para probar conexión)
-
-## 🚀 Arranque rápido (local)
-
-```bash
-# Compilar sin tests
-mvn clean package -DskipTests
-
-# Ejecutar en perfil dev (usa application-dev.yml)
-- `POST /api/contenidos` - Subir contenido
+# Ejecutar contenedor
+docker run -p 8080:8080 \
+  -e SPRING_PROFILES_ACTIVE=prod \
+  -e DB_HOST=servidor.postgres.database.azure.com \
+  -e DB_USER=usuario \
+  -e DB_PASSWORD=contraseña \
+  innoad-backend:latest
 ```
 
-### Variables clave (prod/dev)
+## ☁️ Producción (Azure Container Apps)
 
-- `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_SSL_MODE`
-- `SPRING_JPA_HIBERNATE_DDL-AUTO=update`
-- `JWT_SECRET` (Base64 válido; ya corregido en Azure)
-- `INNOAD_FRONTEND_URL` para CORS
+```
+URL: https://innoad-backend.wonderfuldune-d0f51e2f.eastus2.azurecontainerapps.io
+Health: /actuator/health
+Versión actual: v2.0.4
+```
 
-## ☁️ Producción (Azure)
+## 🛠️ Desarrollo
 
-- Imagen activa: `kevinburgos0412/innoad-backend:v2.0.4` (Container Apps)
-- URL: `https://innoad-backend.wonderfuldune-d0f51e2f.eastus2.azurecontainerapps.io`
-- Health: `/actuator/health`
-- DDL auto: `update` (sincroniza esquema con columnas nuevas)
+```bash
+# Compilar con tests
+mvn clean test
+
+# Generar JAR ejecutable
+mvn clean package
+
+# Archivo JAR
+target/innoad-backend-2.0.0.jar
+```
+
+## 📖 Documentación
+
+- **API REST**: Postman collection incluida
+- **Estructura**: Ver `src/main/java/com/innoad/`
+- **Configuración**: `src/main/resources/application*.yml`
+
+## ✅ Status
+
+- ✅ Compilación: OK
+- ✅ Seguridad: Implementada
+- ✅ Modo Mantenimiento: Activo
+- ✅ IA Chat: Integrada
+- ✅ Azure: Desplegado
 
 ## 🆕 Cambios recientes
 

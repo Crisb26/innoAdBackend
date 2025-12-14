@@ -1,22 +1,28 @@
 package com.innoad.modules.admin.service;
 
 import com.innoad.modules.admin.domain.ConfiguracionSistema;
+import com.innoad.modules.admin.domain.TipoMantenimiento;
 import com.innoad.modules.auth.domain.Usuario;
 import com.innoad.modules.admin.repository.RepositorioConfiguracionSistema;
 import com.innoad.servicio.ServicioEmail;
+import com.innoad.shared.dto.RolUsuario;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
  * Servicio para gestionar el modo mantenimiento del sistema.
  * Controla el acceso basado en roles y código de seguridad.
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ServicioModoMantenimiento {
@@ -34,7 +40,156 @@ public class ServicioModoMantenimiento {
     private static final String CLAVE_CONFIG_MANTENIMIENTO = "MODO_MANTENIMIENTO";
     
     /**
-     * Activa el modo mantenimiento
+     * Activa el modo mantenimiento CON CONTROL DE ROLES
+     */
+    @Transactional
+    public void activarModoMantenimiento(
+            Usuario usuario,
+            String codigoSeguridad,
+            String mensaje,
+            LocalDateTime fechaFinEstimada,
+            TipoMantenimiento tipo,
+            List<RolUsuario> rolesAfectados,
+            List<RolUsuario> rolesExcluidos,
+            String urlContacto
+    ) {
+        if (!usuario.esAdministrador()) {
+            throw new RuntimeException("Solo administradores pueden activar mantenimiento");
+        }
+
+        if (!verificarCodigoSeguridad(codigoSeguridad)) {
+            throw new RuntimeException("Código de seguridad inválido");
+        }
+
+        ConfiguracionSistema config = obtenerOCrearConfiguracion();
+
+        // Validar y establecer rolesExcluidos (ADMIN y DESARROLLADOR siempre)
+        if (rolesExcluidos == null) {
+            rolesExcluidos = new ArrayList<>();
+        }
+        if (!rolesExcluidos.contains(RolUsuario.ADMIN)) {
+            rolesExcluidos.add(RolUsuario.ADMIN);
+        }
+        if (!rolesExcluidos.contains(RolUsuario.DESARROLLADOR)) {
+            rolesExcluidos.add(RolUsuario.DESARROLLADOR);
+        }
+
+        // Si no especifica roles afectados, afectar a VISITANTE y USUARIO
+        if (rolesAfectados == null || rolesAfectados.isEmpty()) {
+            rolesAfectados = List.of(RolUsuario.VISITANTE, RolUsuario.USUARIO);
+        }
+
+        // Activar
+        config.setModoMantenimientoActivo(true);
+        config.setFechaInicioMantenimiento(LocalDateTime.now());
+        config.setFechaFinEstimadaMantenimiento(fechaFinEstimada);
+        config.setMensajeMantenimiento(mensaje != null ? mensaje : 
+            "Estamos mejorando nuestro sistema para ofrecerte una mejor experiencia. Volveremos pronto.");
+        config.setTipoMantenimiento(tipo != null ? tipo : TipoMantenimiento.PROGRAMADO);
+        config.setRolesAfectados(rolesAfectados);
+        config.setRolesExcluidos(rolesExcluidos);
+        config.setUrlContactoSoporte(urlContacto != null ? urlContacto : "soporte@innoad.com");
+        config.setUsuarioActualizacionId(usuario.getId());
+        config.setFechaActualizacion(LocalDateTime.now());
+
+        repositorioConfiguracion.save(config);
+        
+        log.info("Modo mantenimiento activado por {}. Tipo: {}. Roles afectados: {}",
+                usuario.getEmail(), tipo, rolesAfectados);
+    }
+    
+    /**
+     * Desactiva el modo mantenimiento
+     */
+    @Transactional
+    public void desactivarModoMantenimiento(Usuario usuario, String codigoSeguridad) {
+        if (!usuario.esAdministrador()) {
+            throw new RuntimeException("Solo administradores pueden desactivar mantenimiento");
+        }
+
+        if (!verificarCodigoSeguridad(codigoSeguridad)) {
+            throw new RuntimeException("Código de seguridad inválido");
+        }
+
+        ConfiguracionSistema config = obtenerOCrearConfiguracion();
+        
+        config.setModoMantenimientoActivo(false);
+        config.setFechaFinEstimadaMantenimiento(null);
+        config.setUsuarioActualizacionId(usuario.getId());
+        config.setFechaActualizacion(LocalDateTime.now());
+
+        repositorioConfiguracion.save(config);
+        
+        log.info("Modo mantenimiento desactivado por {}", usuario.getEmail());
+    }
+    
+    /**
+     * Verifica si el modo mantenimiento está activo
+     */
+    public boolean esModoMantenimientoActivo() {
+        Optional<ConfiguracionSistema> config = repositorioConfiguracion
+                .findByClave(CLAVE_CONFIG_MANTENIMIENTO);
+        
+        if (config.isPresent()) {
+            return config.get().estaActivo();
+        }
+        return false;
+    }
+    
+    /**
+     * Obtiene la información del modo mantenimiento
+     */
+    public ConfiguracionSistema obtenerInformacionMantenimiento() {
+        return obtenerOCrearConfiguracion();
+    }
+
+    /**
+     * Verifica si un usuario puede acceder durante el mantenimiento
+     */
+    public boolean puedeAcceder(Usuario usuario) {
+        ConfiguracionSistema config = obtenerOCrearConfiguracion();
+        return config.puedeAcceder(usuario.getRol());
+    }
+
+    /**
+     * Verifica el código de seguridad
+     */
+    private boolean verificarCodigoSeguridad(String codigoIngresado) {
+        ConfiguracionSistema config = obtenerOCrearConfiguracion();
+        
+        if (config.getCodigoSeguridadMantenimiento() != null) {
+            return passwordEncoder.matches(codigoIngresado, config.getCodigoSeguridadMantenimiento());
+        }
+        
+        return codigoIngresado.equals(codigoSeguridadPorDefecto);
+    }
+    
+    /**
+     * Obtiene o crea la configuración de mantenimiento
+     */
+    private ConfiguracionSistema obtenerOCrearConfiguracion() {
+        return repositorioConfiguracion.findByClave(CLAVE_CONFIG_MANTENIMIENTO)
+                .orElseGet(() -> {
+                    ConfiguracionSistema nuevaConfig = new ConfiguracionSistema();
+                    nuevaConfig.setClave(CLAVE_CONFIG_MANTENIMIENTO);
+                    nuevaConfig.setValor("false");
+                    nuevaConfig.setDescripcion("Configuración del modo mantenimiento del sistema");
+                    nuevaConfig.setModoMantenimientoActivo(false);
+                    nuevaConfig.setTipoMantenimiento(TipoMantenimiento.PROGRAMADO);
+                    nuevaConfig.setRolesExcluidos(
+                        List.of(RolUsuario.ADMIN, RolUsuario.DESARROLLADOR)
+                    );
+                    nuevaConfig.setRolesAfectados(
+                        List.of(RolUsuario.VISITANTE, RolUsuario.USUARIO)
+                    );
+                    nuevaConfig.setUrlContactoSoporte("soporte@innoad.com");
+                    return repositorioConfiguracion.save(nuevaConfig);
+                });
+    }
+}
+    
+    /**
+     * Activa el modo mantenimiento CON CONTROL DE ROLES
      */
     @Transactional
     public void activarModoMantenimiento(Usuario usuario, String codigoSeguridad, String mensaje, LocalDateTime fechaFinEstimada) {
