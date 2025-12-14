@@ -116,6 +116,13 @@
             <artifactId>reactor-netty-http</artifactId>
         </dependency>
         
+        <!-- Rate Limiting - Bucket4j -->
+        <dependency>
+            <groupId>com.github.vladimir-bukhtoyarov</groupId>
+            <artifactId>bucket4j-core</artifactId>
+            <version>7.6.0</version>
+        </dependency>
+        
         <!-- OpenAPI/Swagger para documentación -->
         <dependency>
             <groupId>org.springdoc</groupId>
