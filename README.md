@@ -1,6 +1,6 @@
 # InnoAd Backend 🚀
 
-API REST para gestión de campañas publicitarias con autenticación JWT, IA integrada y pantallas digitales.
+API REST para gestión de campañas publicitarias con autenticación JWT, IA integrada, sistema de roles y pantallas digitales.
 
 ## 🛠️ Stack Tecnológico
 
@@ -10,13 +10,15 @@ API REST para gestión de campañas publicitarias con autenticación JWT, IA int
 | Java | 21 |
 | PostgreSQL | 17.6 (Azure) |
 | Maven | 3.9.x |
-| Seguridad | Spring Security + JWT |
+| Seguridad | Spring Security + JWT (BCrypt 12 rounds) |
+| Documentación | Swagger/OpenAPI 3.0 |
 
 ## 📋 Requisitos
 
 - **Java 21+**
 - **Maven 3.9+**
 - **Git**
+- **PostgreSQL 17.6+** (para producción)
 
 ## 🚀 Instalación
 
@@ -29,7 +31,7 @@ cd innoadBackend
 mvn clean compile
 
 # 3. Ver estructura
-ls -la src/main/java/com/innoad/modules/
+dir src\main\java\com\innoad\modules\
 ```
 
 ## 🏃 Ejecución Local
@@ -42,39 +44,75 @@ mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=dev"
 mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=prod"
 ```
 
-**Backend disponible en**: http://localhost:8080
+**Backend disponible en**: http://localhost:8080  
+**Swagger UI**: http://localhost:8080/swagger-ui.html
 
 ## 📚 Módulos Principales
 
 ```
 src/main/java/com/innoad/modules/
 ├── admin/              # Control de mantenimiento y seguridad
+├── auth/               # Autenticación y autorización
 ├── campanas/           # Gestión de campañas
 ├── contenidos/         # Almacenamiento de multimedia
 ├── pantallas/          # Gestión de pantallas digitales
-├── usuarios/           # Gestión de usuarios y roles
+├── usuarios/           # Gestión de usuarios
 ├── reportes/           # Estadísticas y reportes
 ├── chat/               # Sistema de chat con IA
-└── utils/              # Utilidades compartidas
+└── mantenimiento/      # Modo mantenimiento del sistema
 ```
+
+### 🆕 Módulos Nuevos (Fase 4)
+
+**1. Sistema de Roles** (`roles/`)
+- Entidad: `Rol.java`
+- Repositorio: `RepositorioRol.java`
+- Servicio: `ServicioRol.java` (7 métodos CRUD)
+- Controlador: `ControladorRol.java` (9 endpoints REST)
+- Permisos: 20+ tipos configurables
+
+**2. Modo Mantenimiento** (`mantenimiento/`)
+- Entidad: `ModoMantenimiento.java`
+- Servicio: `ServicioModoMantenimiento.java` (5 métodos)
+- Controlador: `ControladorModoMantenimiento.java` (5 endpoints)
+- Endpoints:
+  - `GET /api/mantenimiento/estado` - Estado actual
+  - `POST /api/mantenimiento/activar` - Activar con mensaje
+  - `POST /api/mantenimiento/desactivar` - Desactivar
+
+**3. Servicio de Correos** (`correos/`)
+- Clase: `ServicioCorreos.java`
+- 7 métodos de notificación:
+  - `enviarEmailSimple()`
+  - `enviarEmailMultipleDestinatarios()`
+  - `enviarEmailHtml()`
+  - `notificarCreacionCampana()`
+  - `notificarPublicacionContenido()`
+  - `notificarModoMantenimiento()`
+  - `notificarReportesGenerados()`
 
 ## 🔐 Seguridad
 
-- **Autenticación**: JWT (tokens)
-- **Autorización**: Control de roles (ADMIN, USUARIO, VISITANTE, etc.)
+- **Autenticación**: JWT (tokens seguros)
+- **Hashing**: BCrypt 12 rounds
+- **Autorización**: Control de roles (ADMIN, USUARIO, VISITANTE, OPERADOR, GERENTE)
 - **Base Datos**: Credenciales en variables de entorno
-- **Modo Mantenimiento**: Sistema profesional de control de acceso
+- **Modo Mantenimiento**: Sistema profesional con acceso administrativo
+- **Validación**: Anotaciones Jakarta Validation
 
 ## 📡 Endpoints Principales
 
 | Método | Ruta | Descripción |
 |--------|------|-------------|
+| POST | `/api/auth/register` | Registrar usuario |
 | POST | `/api/auth/login` | Autenticación |
 | GET | `/api/campanas` | Listar campañas |
 | POST | `/api/campanas` | Crear campaña |
 | GET | `/api/pantallas` | Listar pantallas |
-| POST | `/api/admin/mantenimiento/activar` | Activar modo mantenimiento |
-| GET | `/api/admin/mantenimiento/estado` | Estado del sistema |
+| GET | `/api/mantenimiento/estado` | Estado del sistema |
+| POST | `/api/mantenimiento/activar` | Activar mantenimiento |
+| GET | `/api/roles` | Listar roles |
+| POST | `/api/roles` | Crear rol personalizado |
 
 ## 🗄️ Base de Datos
 
@@ -82,6 +120,15 @@ src/main/java/com/innoad/modules/
 
 - **DEV**: H2 en memoria (sin configuración)
 - **PROD**: PostgreSQL 17.6 en Azure Flexible Server
+
+### Tablas Principales
+
+- `usuarios` - Cuenta de usuario con JPA UserDetails
+- `roles` - Roles del sistema con permisos
+- `modo_mantenimiento` - Estado del mantenimiento
+- `campanas` - Campañas publicitarias
+- `pantallas` - Dispositivos de reproducción
+- `contenidos` - Archivos multimedia
 
 ### Conexión
 
@@ -116,6 +163,7 @@ docker run -p 8080:8080 \
 URL: https://innoad-backend.wonderfuldune-d0f51e2f.eastus2.azurecontainerapps.io
 Health: /actuator/health
 Versión actual: v2.0.4
+Región: East US 2
 ```
 
 ## 🛠️ Desarrollo
@@ -131,19 +179,40 @@ mvn clean package
 target/innoad-backend-2.0.0.jar
 ```
 
-## 📖 Documentación
+## 📖 Documentación API
 
-- **API REST**: Postman collection incluida
+- **Swagger UI**: http://localhost:8080/swagger-ui.html
+- **API Docs**: http://localhost:8080/v3/api-docs
+- **Postman Collection**: Incluida en raíz del proyecto
 - **Estructura**: Ver `src/main/java/com/innoad/`
 - **Configuración**: `src/main/resources/application*.yml`
+
+## 📊 Estadísticas del Proyecto
+
+- **Controladores REST**: 15+
+- **Endpoints Totales**: 65+
+- **Entidades JPA**: 12+
+- **Servicios Negocio**: 10+
+- **Métodos Validados**: 100%
 
 ## ✅ Status
 
 - ✅ Compilación: OK
 - ✅ Seguridad: Implementada
+- ✅ Sistema de Roles: Completado
 - ✅ Modo Mantenimiento: Activo
+- ✅ Servicio Correos: Integrado
 - ✅ IA Chat: Integrada
 - ✅ Azure: Desplegado
+- ✅ PostgreSQL: Conectado
+
+## 🎯 Próximos Pasos
+
+- [ ] Webhooks para integraciones externas
+- [ ] WebSocket para actualizaciones en tiempo real
+- [ ] Caché distribuido (Redis)
+- [ ] Message Broker (RabbitMQ)
+- [ ] Auditoría avanzada
 
 ## 🆕 Cambios recientes
 
