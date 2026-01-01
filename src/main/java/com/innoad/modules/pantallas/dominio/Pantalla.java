@@ -2,7 +2,7 @@ package com.innoad.modules.pantallas.dominio;
 
 import jakarta.persistence.*;
 import lombok.*;
-import com.innoad.modules.usuario.dominio.Usuario;
+import com.innoad.modules.usuarios.dominio.Usuario;
 import com.innoad.modules.campanas.dominio.Campana;
 import java.time.LocalDateTime;
 
