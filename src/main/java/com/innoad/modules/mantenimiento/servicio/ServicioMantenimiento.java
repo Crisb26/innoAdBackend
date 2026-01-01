@@ -30,7 +30,7 @@ public class ServicioMantenimiento {
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         // Validar que sea admin
-        if (!usuario.getRol().getNombre().equals("ADMIN")) {
+        if (usuario.getRol() == null || !usuario.getRol().name().equals("ADMIN")) {
             throw new IllegalArgumentException("Solo los administradores pueden activar mantenimiento");
         }
         
@@ -69,7 +69,7 @@ public class ServicioMantenimiento {
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         // Validar que sea admin
-        if (!usuario.getRol().getNombre().equals("ADMIN")) {
+        if (usuario.getRol() == null || !usuario.getRol().name().equals("ADMIN")) {
             throw new IllegalArgumentException("Solo los administradores pueden desactivar mantenimiento");
         }
         

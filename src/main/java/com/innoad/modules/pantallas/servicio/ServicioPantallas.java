@@ -3,8 +3,6 @@ package com.innoad.modules.pantallas.servicio;
 import com.innoad.modules.pantallas.dominio.Pantalla;
 import com.innoad.modules.pantallas.dto.PantallaDTO;
 import com.innoad.modules.pantallas.repositorio.RepositorioPantallas;
-import com.innoad.modules.usuario.dominio.Usuario;
-import com.innoad.modules.usuario.repositorio.RepositorioUsuario;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -23,7 +21,6 @@ import java.util.stream.Collectors;
 public class ServicioPantallas {
     
     private final RepositorioPantallas repositorioPantallas;
-    private final RepositorioUsuario repositorioUsuario;
     
     /**
      * Crear nueva pantalla

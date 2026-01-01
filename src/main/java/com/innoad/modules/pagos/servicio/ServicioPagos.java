@@ -205,7 +205,7 @@ public class ServicioPagos {
             .fechaCreacion(pago.getFechaCreacion())
             .fechaPago(pago.getFechaPago())
             .codigoAutorizacion(pago.getCodigoAutorizacion())
-            .montoReembolsado(pago.getMonoReembolsado())
+            .montoReembolsado(pago.getMontoReembolsado())
             .fechaReembolso(pago.getFechaReembolso())
             .build();
     }

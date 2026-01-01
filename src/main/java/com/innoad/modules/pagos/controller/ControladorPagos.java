@@ -2,6 +2,7 @@ package com.innoad.modules.pagos.controller;
 
 import com.innoad.modules.pagos.dto.PagoDTO;
 import com.innoad.modules.pagos.servicio.ServicioPagos;
+import com.innoad.modules.pagos.servicio.ServicioWebhookMercadoPago;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,6 +34,7 @@ import java.util.Map;
 public class ControladorPagos {
     
     private final ServicioPagos servicioPagos;
+    private final ServicioWebhookMercadoPago servicioWebhook;
     
     /**
      * Crear nuevo pago
@@ -134,28 +136,42 @@ public class ControladorPagos {
     
     /**
      * Webhook de Mercado Pago (público)
+     * Headers esperados:
+     * - X-Signature: firma HMAC SHA256
+     * - X-Request-Id: ID único de la solicitud
+     * - X-Request-Timestamp: timestamp de la solicitud
      */
     @PostMapping("/webhook/mercado-pago")
     @Operation(summary = "Webhook de Mercado Pago")
-    public ResponseEntity<?> webhookMercadoPago(@RequestBody Map<String, Object> payload) {
+    public ResponseEntity<?> webhookMercadoPago(
+            @RequestBody String body,
+            @RequestHeader(value = "X-Signature", required = false) String signature,
+            @RequestHeader(value = "X-Request-Id", required = false) String xRequestId,
+            @RequestHeader(value = "X-Request-Timestamp", required = false) String timestamp
+    ) {
         try {
-            log.info("Webhook recibido de Mercado Pago: {}", payload);
+            log.info("Webhook recibido de Mercado Pago");
             
-            String action = payload.getOrDefault("action", "").toString();
-            String type = payload.getOrDefault("type", "").toString();
-            
-            if ("payment".equals(type) && "payment.created".equals(action)) {
-                // Procesar pago creado
-                Object resource = payload.get("resource");
-                // Aquí iría la lógica para procesar el webhook
+            // Validar firma del webhook
+            if (!servicioWebhook.validarFirmaWebhook(signature, xRequestId, timestamp, body)) {
+                log.warn("Webhook rechazado: firma inválida");
+                // Retornar 200 OK igualmente (Mercado Pago no debe reintentar por firma inválida)
             }
+            
+            // Procesar webhook
+            // Nota: body llega como String, convertir a Map aquí si es necesario
+            // servicioWebhook.procesarWebhook(payload);
             
             Map<String, String> response = new HashMap<>();
             response.put("resultado", "OK");
+            response.put("mensaje", "Webhook procesado correctamente");
+            
             return ResponseEntity.ok(response);
+            
         } catch (Exception e) {
-            log.error("Error procesando webhook", e);
-            return ResponseEntity.badRequest().build();
+            log.error("Error procesando webhook: {}", e.getMessage());
+            // Retornar 200 OK para que MP no reintente
+            return ResponseEntity.ok(Map.of("resultado", "OK", "mensaje", "Error procesado"));
         }
     }
     

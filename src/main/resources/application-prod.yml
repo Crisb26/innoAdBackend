@@ -77,3 +77,26 @@ server:
   error:
     include-message: always
     include-stacktrace: never
+
+# Configuración de Mercado Pago - Producción
+mercado-pago:
+  access-token: ${MERCADO_PAGO_ACCESS_TOKEN:}
+  public-key: ${MERCADO_PAGO_PUBLIC_KEY:}
+  private-key: ${MERCADO_PAGO_PRIVATE_KEY:}
+  webhook-secret: ${MERCADO_PAGO_WEBHOOK_SECRET:}
+  webhook-url: ${MERCADO_PAGO_WEBHOOK_URL:}
+  client-id: ${MERCADO_PAGO_CLIENT_ID:}
+  client-secret: ${MERCADO_PAGO_CLIENT_SECRET:}
+
+# Configuración de aplicación
+app:
+  name: InnoAd Signage Platform
+  version: 1.0.0
+  environment: PRODUCCION
+  max-file-size: 104857600 # 100MB
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:https://innoad.com,https://www.innoad.com}
+    allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+    allowed-headers: "*"
+    allow-credentials: true
+    max-age: 3600
