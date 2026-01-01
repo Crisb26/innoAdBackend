@@ -1,7 +1,7 @@
 package com.innoad.modules.contenidos.dominio;
 
 import com.innoad.modules.campanas.dominio.Campana;
-import com.innoad.modules.usuarios.dominio.Usuario;
+import com.innoad.modules.auth.domain.Usuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

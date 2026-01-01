@@ -3,7 +3,7 @@ package com.innoad.modules.mantenimiento.servicio;
 import com.innoad.modules.mantenimiento.dominio.Mantenimiento;
 import com.innoad.modules.mantenimiento.dto.MantenimientoDTO;
 import com.innoad.modules.mantenimiento.repositorio.RepositorioMantenimiento;
-import com.innoad.modules.usuarios.repositorio.RepositorioUsuarios;
+import com.innoad.modules.auth.repository.RepositorioUsuario;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,14 +19,14 @@ import java.time.LocalDateTime;
 public class ServicioMantenimiento {
     
     private final RepositorioMantenimiento repositorioMantenimiento;
-    private final RepositorioUsuarios repositorioUsuarios;
+    private final RepositorioUsuario repositorioUsuario;
     private final PasswordEncoder passwordEncoder;
     
     /**
      * Activar mantenimiento
      */
     public MantenimientoDTO activarMantenimiento(MantenimientoDTO dto, String usuarioEmail) {
-        var usuario = repositorioUsuarios.findByEmail(usuarioEmail)
+        var usuario = repositorioUsuario.findByEmail(usuarioEmail)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         // Validar que sea admin
@@ -65,7 +65,7 @@ public class ServicioMantenimiento {
      * Desactivar mantenimiento
      */
     public void desactivarMantenimiento(String usuarioEmail) {
-        var usuario = repositorioUsuarios.findByEmail(usuarioEmail)
+        var usuario = repositorioUsuario.findByEmail(usuarioEmail)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         // Validar que sea admin
@@ -113,7 +113,7 @@ public class ServicioMantenimiento {
      * Actualizar configuración de mantenimiento
      */
     public MantenimientoDTO actualizar(Long id, MantenimientoDTO dto, String usuarioEmail) {
-        var usuario = repositorioUsuarios.findByEmail(usuarioEmail)
+        var usuario = repositorioUsuario.findByEmail(usuarioEmail)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         if (!usuario.getRol().getNombre().equals("ADMIN")) {

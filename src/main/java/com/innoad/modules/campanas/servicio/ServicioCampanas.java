@@ -3,8 +3,8 @@ package com.innoad.modules.campanas.servicio;
 import com.innoad.modules.campanas.dominio.Campana;
 import com.innoad.modules.campanas.dto.CampanaDTO;
 import com.innoad.modules.campanas.repositorio.RepositorioCampanas;
-import com.innoad.modules.usuarios.dominio.Usuario;
-import com.innoad.modules.usuarios.repositorio.RepositorioUsuarios;
+import com.innoad.modules.auth.domain.Usuario;
+import com.innoad.modules.auth.repository.RepositorioUsuario;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class ServicioCampanas {
     
     private final RepositorioCampanas repositorioCampanas;
-    private final RepositorioUsuarios repositorioUsuarios;
+    private final RepositorioUsuario repositorioUsuario;
     
     /**
      * Crear una nueva campaña
@@ -32,7 +32,7 @@ public class ServicioCampanas {
         log.info("Creando campaña: {} para usuario: {}", dto.getNombre(), usuarioUsername);
         
         // Validar usuario
-        Usuario usuario = repositorioUsuarios.findByEmail(usuarioUsername)
+        Usuario usuario = repositorioUsuario.findByEmail(usuarioUsername)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         // Validar fechas
@@ -67,7 +67,7 @@ public class ServicioCampanas {
      */
     @Transactional(readOnly = true)
     public CampanaDTO obtenerCampana(Long id, String usuarioUsername) {
-        Usuario usuario = repositorioUsuarios.findByEmail(usuarioUsername)
+        Usuario usuario = repositorioUsuario.findByEmail(usuarioUsername)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         Campana campana = repositorioCampanas.findByIdAndUsuarioId(id, usuario.getId())
@@ -81,7 +81,7 @@ public class ServicioCampanas {
      */
     @Transactional(readOnly = true)
     public Page<CampanaDTO> listarCampanas(String usuarioUsername, Pageable pageable) {
-        Usuario usuario = repositorioUsuarios.findByEmail(usuarioUsername)
+        Usuario usuario = repositorioUsuario.findByEmail(usuarioUsername)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         return repositorioCampanas.findByUsuarioIdOrderByFechaCreacionDesc(usuario.getId(), pageable)
@@ -93,7 +93,7 @@ public class ServicioCampanas {
      */
     @Transactional(readOnly = true)
     public Page<CampanaDTO> listarPorEstado(String usuarioUsername, String estado, Pageable pageable) {
-        Usuario usuario = repositorioUsuarios.findByEmail(usuarioUsername)
+        Usuario usuario = repositorioUsuario.findByEmail(usuarioUsername)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         Campana.EstadoCampana estadoEnum = Campana.EstadoCampana.valueOf(estado.toUpperCase());
@@ -107,7 +107,7 @@ public class ServicioCampanas {
      */
     @Transactional(readOnly = true)
     public Page<CampanaDTO> buscarPorNombre(String usuarioUsername, String nombre, Pageable pageable) {
-        Usuario usuario = repositorioUsuarios.findByEmail(usuarioUsername)
+        Usuario usuario = repositorioUsuario.findByEmail(usuarioUsername)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         return repositorioCampanas.findByUsuarioIdAndNombreContainingIgnoreCaseOrderByFechaCreacionDesc(
@@ -121,7 +121,7 @@ public class ServicioCampanas {
     public CampanaDTO actualizarCampana(Long id, CampanaDTO dto, String usuarioUsername) {
         log.info("Actualizando campaña: {}", id);
         
-        Usuario usuario = repositorioUsuarios.findByEmail(usuarioUsername)
+        Usuario usuario = repositorioUsuario.findByEmail(usuarioUsername)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         Campana campana = repositorioCampanas.findByIdAndUsuarioId(id, usuario.getId())
@@ -159,7 +159,7 @@ public class ServicioCampanas {
     public CampanaDTO cambiarEstado(Long id, String nuevoEstado, String usuarioUsername) {
         log.info("Cambiando estado de campaña {} a: {}", id, nuevoEstado);
         
-        Usuario usuario = repositorioUsuarios.findByEmail(usuarioUsername)
+        Usuario usuario = repositorioUsuario.findByEmail(usuarioUsername)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         Campana campana = repositorioCampanas.findByIdAndUsuarioId(id, usuario.getId())
@@ -180,7 +180,7 @@ public class ServicioCampanas {
     public void eliminarCampana(Long id, String usuarioUsername) {
         log.info("Eliminando campaña: {}", id);
         
-        Usuario usuario = repositorioUsuarios.findByEmail(usuarioUsername)
+        Usuario usuario = repositorioUsuario.findByEmail(usuarioUsername)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         Campana campana = repositorioCampanas.findByIdAndUsuarioId(id, usuario.getId())
@@ -200,7 +200,7 @@ public class ServicioCampanas {
      */
     @Transactional(readOnly = true)
     public List<CampanaDTO> getCampanasActivas(String usuarioUsername) {
-        Usuario usuario = repositorioUsuarios.findByEmail(usuarioUsername)
+        Usuario usuario = repositorioUsuario.findByEmail(usuarioUsername)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         return repositorioCampanas.findCampanasActivasDelUsuario(usuario.getId())

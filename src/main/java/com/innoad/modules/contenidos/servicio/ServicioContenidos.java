@@ -4,7 +4,7 @@ import com.innoad.modules.campanas.repositorio.RepositorioCampanas;
 import com.innoad.modules.contenidos.dominio.Contenido;
 import com.innoad.modules.contenidos.dto.ContenidoDTO;
 import com.innoad.modules.contenidos.repositorio.RepositorioContenidos;
-import com.innoad.modules.usuarios.repositorio.RepositorioUsuarios;
+import com.innoad.modules.auth.repository.RepositorioUsuario;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,7 +30,7 @@ public class ServicioContenidos {
     
     private final RepositorioContenidos repositorioContenidos;
     private final RepositorioCampanas repositorioCampanas;
-    private final RepositorioUsuarios repositorioUsuarios;
+    private final RepositorioUsuario repositorioUsuario;
     
     @Value("${app.archivos.directorio:uploads/contenidos}")
     private String directorioArchivos;
@@ -48,7 +48,7 @@ public class ServicioContenidos {
     ) throws IOException {
         validarArchivo(archivo, dto.getTipo());
         
-        var usuario = repositorioUsuarios.findByEmail(usuarioEmail)
+        var usuario = repositorioUsuario.findByEmail(usuarioEmail)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         var campana = repositorioCampanas.findByIdAndUsuarioId(dto.getCampanaId(), usuario.getId())
@@ -87,7 +87,7 @@ public class ServicioContenidos {
      */
     @Transactional(readOnly = true)
     public ContenidoDTO obtenerContenido(Long id, String usuarioEmail) {
-        var usuario = repositorioUsuarios.findByEmail(usuarioEmail)
+        var usuario = repositorioUsuario.findByEmail(usuarioEmail)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         var contenido = repositorioContenidos.findByIdAndUsuarioId(id, usuario.getId())
@@ -101,7 +101,7 @@ public class ServicioContenidos {
      */
     @Transactional(readOnly = true)
     public Page<ContenidoDTO> listarContenidos(String usuarioEmail, Pageable pageable) {
-        var usuario = repositorioUsuarios.findByEmail(usuarioEmail)
+        var usuario = repositorioUsuario.findByEmail(usuarioEmail)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         return repositorioContenidos.findByUsuarioId(usuario.getId(), pageable)
@@ -117,7 +117,7 @@ public class ServicioContenidos {
             Long campanaId,
             Pageable pageable
     ) {
-        var usuario = repositorioUsuarios.findByEmail(usuarioEmail)
+        var usuario = repositorioUsuario.findByEmail(usuarioEmail)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         // Validar que la campaña pertenece al usuario
@@ -137,7 +137,7 @@ public class ServicioContenidos {
             String nombre,
             Pageable pageable
     ) {
-        var usuario = repositorioUsuarios.findByEmail(usuarioEmail)
+        var usuario = repositorioUsuario.findByEmail(usuarioEmail)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         return repositorioContenidos.buscarPorNombre(usuario.getId(), nombre, pageable)
@@ -152,7 +152,7 @@ public class ServicioContenidos {
             ContenidoDTO dto,
             String usuarioEmail
     ) {
-        var usuario = repositorioUsuarios.findByEmail(usuarioEmail)
+        var usuario = repositorioUsuario.findByEmail(usuarioEmail)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         var contenido = repositorioContenidos.findByIdAndUsuarioId(id, usuario.getId())
@@ -172,7 +172,7 @@ public class ServicioContenidos {
      * Publicar/Activar contenido
      */
     public ContenidoDTO publicarContenido(Long id, String usuarioEmail) {
-        var usuario = repositorioUsuarios.findByEmail(usuarioEmail)
+        var usuario = repositorioUsuario.findByEmail(usuarioEmail)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         var contenido = repositorioContenidos.findByIdAndUsuarioId(id, usuario.getId())
@@ -189,7 +189,7 @@ public class ServicioContenidos {
      * Archivar contenido
      */
     public ContenidoDTO archivarContenido(Long id, String usuarioEmail) {
-        var usuario = repositorioUsuarios.findByEmail(usuarioEmail)
+        var usuario = repositorioUsuario.findByEmail(usuarioEmail)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         var contenido = repositorioContenidos.findByIdAndUsuarioId(id, usuario.getId())
@@ -206,7 +206,7 @@ public class ServicioContenidos {
      * Eliminar contenido (también elimina archivo)
      */
     public void eliminarContenido(Long id, String usuarioEmail) throws IOException {
-        var usuario = repositorioUsuarios.findByEmail(usuarioEmail)
+        var usuario = repositorioUsuario.findByEmail(usuarioEmail)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         var contenido = repositorioContenidos.findByIdAndUsuarioId(id, usuario.getId())
@@ -238,7 +238,7 @@ public class ServicioContenidos {
      */
     @Transactional(readOnly = true)
     public List<ContenidoDTO> getContenidosMasReproducidos(String usuarioEmail) {
-        var usuario = repositorioUsuarios.findByEmail(usuarioEmail)
+        var usuario = repositorioUsuario.findByEmail(usuarioEmail)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         return repositorioContenidos.findContenidosMasReproducidos(usuario.getId())
