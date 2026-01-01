@@ -97,6 +97,13 @@
             <scope>runtime</scope>
         </dependency>
         
+        <!-- Mercado Pago SDK para procesamiento de pagos -->
+        <dependency>
+            <groupId>com.mercadopago</groupId>
+            <artifactId>sdk-java</artifactId>
+            <version>2.1.24</version>
+        </dependency>
+        
         <!-- Lombok para reducir código boilerplate -->
         <dependency>
             <groupId>org.projectlombok</groupId>

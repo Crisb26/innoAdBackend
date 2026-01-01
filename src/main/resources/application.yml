@@ -219,3 +219,11 @@ springdoc:
     path: /swagger-ui.html
     operations-sorter: method
     tags-sorter: alpha
+
+# Configuración de Mercado Pago - Fase 5
+mercado-pago:
+  access-token: ${MERCADO_PAGO_ACCESS_TOKEN:}
+  public-key: ${MERCADO_PAGO_PUBLIC_KEY:}
+  webhook-url: ${MERCADO_PAGO_WEBHOOK_URL:}
+  client-id: ${MERCADO_PAGO_CLIENT_ID:}
+  client-secret: ${MERCADO_PAGO_CLIENT_SECRET:}
