@@ -54,22 +54,23 @@ public class ConfiguracionSeguridadAvanzada {
             // ==================== SESSION MANAGEMENT ====================
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .sessionFixationProtection(org.springframework.security.config.http.SessionFixationProtectionStrategy.MIGRATE_SESSION)
-                .maximumSessions(1)
-                .maxSessionsPreventsLogin(false)
             )
             
             // ==================== SECURITY HEADERS ====================
             .headers(headers -> headers
-                .contentSecurityPolicy("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'")
-                .and()
-                .xssProtection()
-                .and()
-                .frameOptions().deny()
-                .and()
-                .httpStrictTransportSecurity()
+                .contentSecurityPolicy(csp -> csp
+                    .policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'")
+                )
+                .xssProtection(xss -> xss
+                    .disable()
+                )
+                .frameOptions(frame -> frame
+                    .deny()
+                )
+                .httpStrictTransportSecurity(hsts -> hsts
                     .includeSubDomains(true)
-                    .maxAgeInSeconds(31536000) // 1 año
+                    .maxAgeInSeconds(31536000)
+                )
             )
             
             // ==================== ENDPOINT SECURITY ====================
@@ -109,11 +110,6 @@ public class ConfiguracionSeguridadAvanzada {
             // ==================== EXCEPTION HANDLING ====================
             .exceptionHandling(exceptionHandling -> exceptionHandling
                 .authenticationEntryPoint(gestorExcepciones)
-            )
-            
-            // ==================== HTTPS REDIRECT ====================
-            .requiresChannel(channel -> channel
-                .anyRequest().requiresSecure()
             );
         
         return http.build();

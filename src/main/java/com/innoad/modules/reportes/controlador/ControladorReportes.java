@@ -1,1 +1,137 @@
-package com.innoad.modules.reportes.controlador;\n\nimport com.innoad.modules.reportes.dto.ReporteDTO;\nimport com.innoad.modules.reportes.servicio.ServicioReportes;\nimport lombok.extern.slf4j.Slf4j;\nimport org.springframework.beans.factory.annotation.Autowired;\nimport org.springframework.http.HttpHeaders;\nimport org.springframework.http.HttpStatus;\nimport org.springframework.http.MediaType;\nimport org.springframework.http.ResponseEntity;\nimport org.springframework.security.access.prepost.PreAuthorize;\nimport org.springframework.web.bind.annotation.*;\n\n@RestController\n@RequestMapping(\"/api/reportes\")\n@Slf4j\n@CrossOrigin(origins = \"*\", maxAge = 3600)\npublic class ControladorReportes {\n\n    @Autowired\n    private ServicioReportes servicioReportes;\n\n    @PostMapping(\"/generar\")\n    @PreAuthorize(\"hasAnyRole('ADMIN', 'SUPER_ADMIN', 'OPERATOR')\")\n    public ResponseEntity<ReporteDTO> generarReporte(\n            @RequestParam String tipo,\n            @RequestParam String periodo) {\n        try {\n            log.info(\"Solicitud para generar reporte: tipo={}, periodo={}\", tipo, periodo);\n            ReporteDTO reporte = servicioReportes.generarReporteAnalytics(tipo, periodo);\n            return ResponseEntity.ok(reporte);\n        } catch (Exception e) {\n            log.error(\"Error generando reporte\", e);\n            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();\n        }\n    }\n\n    @GetMapping(\"/descargar/{id}\")\n    @PreAuthorize(\"hasAnyRole('ADMIN', 'SUPER_ADMIN', 'OPERATOR')\")\n    public ResponseEntity<byte[]> descargarReporte(@PathVariable String id) {\n        try {\n            log.info(\"Solicitud para descargar reporte: {}\", id);\n            byte[] contenido = servicioReportes.exportarPDF(id);\n            \n            HttpHeaders headers = new HttpHeaders();\n            headers.setContentType(MediaType.APPLICATION_PDF);\n            headers.setContentDispositionFormData(\"attachment\", \"reporte_\" + id + \".pdf\");\n            headers.setContentLength(contenido.length);\n            \n            return ResponseEntity.ok().headers(headers).body(contenido);\n        } catch (Exception e) {\n            log.error(\"Error descargando reporte\", e);\n            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();\n        }\n    }\n\n    @GetMapping(\"/descargar-csv/{id}\")\n    @PreAuthorize(\"hasAnyRole('ADMIN', 'SUPER_ADMIN', 'OPERATOR')\")\n    public ResponseEntity<byte[]> descargarReporteCSV(@PathVariable String id) {\n        try {\n            log.info(\"Solicitud para descargar reporte CSV: {}\", id);\n            byte[] contenido = servicioReportes.exportarCSV(id);\n            \n            HttpHeaders headers = new HttpHeaders();\n            headers.setContentType(MediaType.parseMediaType(\"text/csv\"));\n            headers.setContentDispositionFormData(\"attachment\", \"reporte_\" + id + \".csv\");\n            headers.setContentLength(contenido.length);\n            \n            return ResponseEntity.ok().headers(headers).body(contenido);\n        } catch (Exception e) {\n            log.error(\"Error descargando reporte CSV\", e);\n            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();\n        }\n    }\n\n    @GetMapping(\"/pdf/{periodo}\")\n    @PreAuthorize(\"hasAnyRole('ADMIN', 'SUPER_ADMIN', 'OPERATOR')\")\n    public ResponseEntity<byte[]> exportarPDF(@PathVariable String periodo) {\n        try {\n            log.info(\"Exportando PDF para periodo: {}\", periodo);\n            byte[] contenido = servicioReportes.exportarPDF(periodo);\n            \n            HttpHeaders headers = new HttpHeaders();\n            headers.setContentType(MediaType.APPLICATION_PDF);\n            headers.setContentDispositionFormData(\"attachment\", \"reporte_\" + periodo + \".pdf\");\n            \n            return ResponseEntity.ok().headers(headers).body(contenido);\n        } catch (Exception e) {\n            log.error(\"Error en exportacion PDF\", e);\n            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();\n        }\n    }\n\n    @GetMapping(\"/csv/{periodo}\")\n    @PreAuthorize(\"hasAnyRole('ADMIN', 'SUPER_ADMIN', 'OPERATOR')\")\n    public ResponseEntity<byte[]> exportarCSV(@PathVariable String periodo) {\n        try {\n            log.info(\"Exportando CSV para periodo: {}\", periodo);\n            byte[] contenido = servicioReportes.exportarCSV(periodo);\n            \n            HttpHeaders headers = new HttpHeaders();\n            headers.setContentType(MediaType.parseMediaType(\"text/csv\"));\n            headers.setContentDispositionFormData(\"attachment\", \"reporte_\" + periodo + \".csv\");\n            \n            return ResponseEntity.ok().headers(headers).body(contenido);\n        } catch (Exception e) {\n            log.error(\"Error en exportacion CSV\", e);\n            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();\n        }\n    }\n}\n
+package com.innoad.modules.reportes.controlador;
+
+import com.innoad.modules.reportes.dto.ReporteDTO;
+import com.innoad.modules.reportes.servicio.ServicioReportes;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Controlador para gestión de reportes
+ * Endpoints para generar, descargar y consultar reportes
+ */
+@RestController
+@RequestMapping("/api/reportes")
+@Slf4j
+@CrossOrigin(origins = "*", maxAge = 3600)
+public class ControladorReportes {
+
+    @Autowired
+    private ServicioReportes servicioReportes;
+
+    /**
+     * Obtener lista de reportes del usuario
+     */
+    @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'PROFESSIONAL')")
+    public ResponseEntity<List<ReporteDTO>> obtenerReportes() {
+        try {
+            log.info("Solicitando lista de reportes");
+            List<ReporteDTO> reportes = servicioReportes.obtenerTodosLosReportes();
+            return ResponseEntity.ok(reportes);
+        } catch (Exception e) {
+            log.error("Error obteniendo reportes", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * Generar nuevo reporte
+     */
+    @PostMapping("/generar")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'PROFESSIONAL')")
+    public ResponseEntity<Map<String, Object>> generarReporte(@RequestBody Map<String, Object> request) {
+        try {
+            log.info("Generando nuevo reporte");
+            String tipo = (String) request.get("tipo");
+            String periodo = (String) request.get("periodo");
+            
+            ReporteDTO reporte = servicioReportes.generarReporte(tipo, periodo);
+            
+            return ResponseEntity.ok(Map.of(
+                "exito", true,
+                "reporte", reporte,
+                "mensaje", "Reporte generado exitosamente"
+            ));
+        } catch (Exception e) {
+            log.error("Error generando reporte", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("exito", false, "error", e.getMessage()));
+        }
+    }
+
+    /**
+     * Descargar reporte en PDF
+     */
+    @GetMapping("/{id}/pdf")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'PROFESSIONAL')")
+    public ResponseEntity<byte[]> descargarReportePDF(@PathVariable Long id) {
+        try {
+            log.info("Descargando reporte en PDF: {}", id);
+            byte[] pdf = servicioReportes.generarPDF(id);
+            return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=reporte_" + id + ".pdf")
+                .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                .body(pdf);
+        } catch (Exception e) {
+            log.error("Error descargando PDF", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * Descargar reporte en Excel
+     */
+    @GetMapping("/{id}/excel")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'PROFESSIONAL')")
+    public ResponseEntity<byte[]> descargarReporteExcel(@PathVariable Long id) {
+        try {
+            log.info("Descargando reporte en Excel: {}", id);
+            byte[] excel = servicioReportes.generarExcel(id);
+            return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=reporte_" + id + ".xlsx")
+                .contentType(org.springframework.http.MediaType.APPLICATION_OCTET_STREAM)
+                .body(excel);
+        } catch (Exception e) {
+            log.error("Error descargando Excel", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * Eliminar reporte
+     */
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    public ResponseEntity<Map<String, Object>> eliminarReporte(@PathVariable Long id) {
+        try {
+            log.info("Eliminando reporte: {}", id);
+            servicioReportes.eliminarReporte(id);
+            return ResponseEntity.ok(Map.of("exito", true, "mensaje", "Reporte eliminado"));
+        } catch (Exception e) {
+            log.error("Error eliminando reporte", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * Obtener detalles de un reporte
+     */
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'PROFESSIONAL')")
+    public ResponseEntity<ReporteDTO> obtenerReporte(@PathVariable Long id) {
+        try {
+            log.info("Obteniendo detalles del reporte: {}", id);
+            ReporteDTO reporte = servicioReportes.obtenerReportePorId(id);
+            return ResponseEntity.ok(reporte);
+        } catch (Exception e) {
+            log.error("Error obteniendo reporte", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+}

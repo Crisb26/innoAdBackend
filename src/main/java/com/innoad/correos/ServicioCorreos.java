@@ -154,7 +154,7 @@ public class ServicioCorreos {
         String contenido = """
                 ¡Bienvenido a InnoAd!
                 
-                Hola """ + nombreUsuario + """,
+                Hola """ + nombreUsuario + """
                 
                 Tu cuenta ha sido creada exitosamente. Ahora puedes:
                 - Crear y gestionar campañas

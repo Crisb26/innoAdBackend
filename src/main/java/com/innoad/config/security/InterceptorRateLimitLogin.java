@@ -17,7 +17,7 @@ public class InterceptorRateLimitLogin implements HandlerInterceptor {
     
     @Override
     public boolean preHandle(HttpServletRequest request, 
-                           javax.servlet.http.HttpServletResponse response, 
+                           jakarta.servlet.http.HttpServletResponse response, 
                            Object handler) throws Exception {
         
         // Solo aplicar rate limit a login
@@ -27,7 +27,7 @@ public class InterceptorRateLimitLogin implements HandlerInterceptor {
             ConsumptionProbe probe = loginRateLimiter.tryConsumeAndReturnRemaining(1);
             
             if (!probe.isConsumed()) {
-                long segundosFaltantes = probe.getRoundedSecondsToWait();
+                long segundosFaltantes = probe.getSecondsToWait();
                 
                 log.warn("Rate limit excedido en login desde IP: {}", clientIP);
                 

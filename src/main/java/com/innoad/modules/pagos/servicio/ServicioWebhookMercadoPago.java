@@ -144,7 +144,7 @@ public class ServicioWebhookMercadoPago {
                     log.warn("Estado de pago no reconocido: {}", statusMercadoPago);
             }
             
-            pago.setUltimaActualizacion(LocalDateTime.now());
+            pago.setFechaActualizacion(LocalDateTime.now());
             repositorioPagos.save(pago);
             
         } catch (Exception e) {

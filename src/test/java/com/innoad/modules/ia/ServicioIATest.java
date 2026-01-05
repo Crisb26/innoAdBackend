@@ -1,13 +1,13 @@
 package com.innoad.modules.ia.servicio;
 
-import com.innoad.modules.ia.dominio.PromptIAPorRol;
-import com.innoad.modules.ia.dominio.HorarioAtencion;
-import com.innoad.modules.ia.dominio.HorarioAtencion.DiaSemana;
-import com.innoad.modules.ia.dominio.RegistroInteraccionIA;
-import com.innoad.modules.ia.dominio.RegistroInteraccionIA.EstadoInteraccion;
-import com.innoad.modules.ia.repositorio.RepositorioPromptIAPorRol;
-import com.innoad.modules.ia.repositorio.RepositorioHorarioAtencion;
-import com.innoad.modules.ia.repositorio.RepositorioRegistroInteraccionIA;
+import com.innoad.modules.ia.domain.PromptIAPorRol;
+import com.innoad.modules.ia.domain.HorarioAtencion;
+import com.innoad.modules.ia.domain.HorarioAtencion.DiaSemana;
+import com.innoad.modules.ia.domain.RegistroInteraccionIA;
+import com.innoad.modules.ia.domain.RegistroInteraccionIA.EstadoInteraccion;
+import com.innoad.modules.ia.repository.RepositorioPromptIAPorRol;
+import com.innoad.modules.ia.repository.RepositorioHorarioAtencion;
+import com.innoad.modules.ia.repository.RepositorioRegistroInteraccionIA;
 import com.innoad.modules.ia.dto.DTOPromptIAPorRol;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

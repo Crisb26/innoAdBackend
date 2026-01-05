@@ -35,6 +35,43 @@ public class PublicacionController {
     }
     
     /**
+     * POST /api/publicaciones/borrador - Guardar publicación como borrador
+     */
+    @PostMapping("/borrador")
+    public ResponseEntity<?> guardarBorrador(@RequestBody PublicacionDTO dto) {
+        try {
+            log.info("POST: Guardando publicación como borrador - {}", dto.getTitulo());
+            dto.setEstado("BORRADOR");
+            PublicacionDTO created = publicacionServicio.crearPublicacion(dto);
+            return ResponseEntity.ok(Map.of(
+                "mensaje", "Publicación guardada como borrador exitosamente",
+                "publicacionId", created.getId(),
+                "estado", "BORRADOR"
+            ));
+        } catch (Exception e) {
+            log.error("Error al guardar borrador", e);
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+    
+    /**
+     * POST /api/publicaciones/mis - Obtener mis publicaciones (del usuario autenticado)
+     */
+    @GetMapping("/mis")
+    public ResponseEntity<?> obtenerMisPublicaciones() {
+        try {
+            log.info("GET: Obteniendo mis publicaciones");
+            // Nota: En producción, obtener usuarioId del JWT token
+            // Por ahora, se puede pasar como parámetro o desde contexto de seguridad
+            List<PublicacionDTO> mis = publicacionServicio.obtenerPublicacionesPublicadas();
+            return ResponseEntity.ok(mis);
+        } catch (Exception e) {
+            log.error("Error al obtener mis publicaciones", e);
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+    
+    /**
      * GET /api/publicaciones/usuario/{usuarioId} - Obtener publicaciones del usuario
      */
     @GetMapping("/usuario/{usuarioId}")

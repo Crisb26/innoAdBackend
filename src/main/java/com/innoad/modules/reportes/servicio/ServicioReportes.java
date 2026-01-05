@@ -1,1 +1,133 @@
-package com.innoad.modules.reportes.servicio;\n\nimport com.innoad.modules.reportes.dto.ReporteDTO;\nimport com.innoad.modules.stats.dto.EstadisticasDTO;\nimport com.innoad.modules.stats.servicio.ServicioAnalytics;\nimport lombok.extern.slf4j.Slf4j;\nimport org.springframework.beans.factory.annotation.Autowired;\nimport org.springframework.stereotype.Service;\nimport java.io.ByteArrayOutputStream;\nimport java.time.LocalDateTime;\nimport java.util.HashMap;\nimport java.util.Map;\nimport java.util.UUID;\n\n@Service\n@Slf4j\npublic class ServicioReportes {\n\n    @Autowired\n    private ServicioAnalytics servicioAnalytics;\n\n    public ReporteDTO generarReporteAnalytics(String tipo, String periodo) {\n        try {\n            log.info(\"Iniciando generacion de reporte: tipo={}, periodo={}\", tipo, periodo);\n            \n            String idReporte = UUID.randomUUID().toString();\n            LocalDateTime ahora = LocalDateTime.now();\n            \n            EstadisticasDTO estadisticas = obtenerEstadisticasPorPeriodo(periodo);\n            \n            Map<String, Object> datosReporte = new HashMap<>();\n            datosReporte.put(\"totalMensajesChat\", estadisticas.getTotalMensajesChat());\n            datosReporte.put(\"totalPreguntasIA\", estadisticas.getTotalPreguntasIA());\n            datosReporte.put(\"tasaExitoIA\", estadisticas.getTasaExitoIA());\n            datosReporte.put(\"costoHoyIA\", estadisticas.getCostoHoyIA());\n            datosReporte.put(\"tasaDisponibilidadSistema\", estadisticas.getTasaDisponibilidadSistema());\n            datosReporte.put(\"totalErrores\", estadisticas.getTotalErrores());\n            datosReporte.put(\"generadoEn\", ahora);\n            datosReporte.put(\"periodo\", periodo);\n            \n            String nombreArchivo = String.format(\"reporte_%s_%s.%s\", periodo, idReporte, tipo.toLowerCase());\n            \n            ReporteDTO reporte = ReporteDTO.builder()\n                .id(idReporte)\n                .titulo(\"Reporte de Analytics - \" + periodo)\n                .tipo(tipo.toUpperCase())\n                .fechaGeneracion(ahora)\n                .estado(\"COMPLETADO\")\n                .urlDescarga(\"/api/reportes/descargar/\" + idReporte)\n                .tamanio(calculartamanioEstimado(tipo))\n                .datos(datosReporte)\n                .periodo(periodo)\n                .build();\n            \n            log.info(\"Reporte generado exitosamente: id={}\", idReporte);\n            return reporte;\n            \n        } catch (Exception e) {\n            log.error(\"Error generando reporte\", e);\n            throw new RuntimeException(\"Error en generacion de reporte: \" + e.getMessage());\n        }\n    }\n\n    public byte[] exportarPDF(String periodoId) {\n        try {\n            log.info(\"Exportando reporte a PDF: {}\", periodoId);\n            ByteArrayOutputStream pdfBytes = new ByteArrayOutputStream();\n            \n            // Implementacion simplificada - en produccion usar iText o PdfBox\n            String contenido = \"REPORTE ANALYTICS\\n\\n\";\n            contenido += \"Generado: \" + LocalDateTime.now() + \"\\n\";\n            contenido += \"Periodo: \" + periodoId + \"\\n\\n\";\n            \n            EstadisticasDTO stats = obtenerEstadisticasPorPeriodo(periodoId);\n            contenido += \"Mensajes Chat: \" + stats.getTotalMensajesChat() + \"\\n\";\n            contenido += \"Preguntas IA: \" + stats.getTotalPreguntasIA() + \"\\n\";\n            contenido += \"Tasa Exito: \" + stats.getTasaExitoIA() + \"%\\n\";\n            contenido += \"Disponibilidad: \" + stats.getTasaDisponibilidadSistema() + \"%\\n\";\n            contenido += \"Errores: \" + stats.getTotalErrores() + \"\\n\";\n            \n            pdfBytes.write(contenido.getBytes());\n            return pdfBytes.toByteArray();\n            \n        } catch (Exception e) {\n            log.error(\"Error exportando PDF\", e);\n            throw new RuntimeException(\"Error en exportacion PDF: \" + e.getMessage());\n        }\n    }\n\n    public byte[] exportarCSV(String periodoId) {\n        try {\n            log.info(\"Exportando reporte a CSV: {}\", periodoId);\n            StringBuilder csv = new StringBuilder();\n            \n            EstadisticasDTO stats = obtenerEstadisticasPorPeriodo(periodoId);\n            \n            csv.append(\"Metrica,Valor\\n\");\n            csv.append(\"Mensajes Chat,\").append(stats.getTotalMensajesChat()).append(\"\\n\");\n            csv.append(\"Preguntas IA,\").append(stats.getTotalPreguntasIA()).append(\"\\n\");\n            csv.append(\"Tasa Exito IA,\").append(stats.getTasaExitoIA()).append(\"%\\n\");\n            csv.append(\"Costo IA,\").append(stats.getCostoHoyIA()).append(\"\\n\");\n            csv.append(\"Disponibilidad,\").append(stats.getTasaDisponibilidadSistema()).append(\"%\\n\");\n            csv.append(\"Total Errores,\").append(stats.getTotalErrores()).append(\"\\n\");\n            csv.append(\"Usuarios Activos,\").append(stats.getTotalUsuariosActivos()).append(\"\\n\");\n            csv.append(\"Solicitudes Procesadas,\").append(stats.getTotalSolicitudesProcessadas()).append(\"\\n\");\n            \n            return csv.toString().getBytes();\n            \n        } catch (Exception e) {\n            log.error(\"Error exportando CSV\", e);\n            throw new RuntimeException(\"Error en exportacion CSV: \" + e.getMessage());\n        }\n    }\n\n    private EstadisticasDTO obtenerEstadisticasPorPeriodo(String periodo) {\n        switch (periodo.toLowerCase()) {\n            case \"ultima-hora\":\n                return servicioAnalytics.obtenerEstadisticasUltimaHora();\n            case \"hoy\":\n                return servicioAnalytics.obtenerEstadisticasHoy();\n            case \"semanal\":\n                return servicioAnalytics.obtenerEstadisticasSemanales();\n            default:\n                return servicioAnalytics.obtenerEstadisticasHoy();\n        }\n    }\n\n    private Long calculartamanioEstimado(String tipo) {\n        switch (tipo.toUpperCase()) {\n            case \"PDF\":\n                return 150000L; // 150 KB\n            case \"CSV\":\n                return 50000L;  // 50 KB\n            case \"EXCEL\":\n                return 100000L; // 100 KB\n            default:\n                return 50000L;\n        }\n    }\n}\n
+package com.innoad.modules.reportes.servicio;
+
+import com.innoad.modules.reportes.modelo.Reporte;
+import com.innoad.modules.reportes.repository.RepositorioReportes;
+import com.innoad.modules.reportes.dto.ReporteDTO;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class ServicioReportes {
+    
+    private final RepositorioReportes repositorioReportes;
+    
+    public Reporte crearReporte(String titulo, String tipo, String periodo, String generadoPor) {
+        Reporte reporte = Reporte.builder()
+            .titulo(titulo)
+            .tipo(tipo)
+            .periodo(periodo)
+            .generadoPor(generadoPor)
+            .fechaGeneracion(LocalDateTime.now())
+            .estado("PENDIENTE")
+            .disponible(false)
+            .build();
+        
+        return repositorioReportes.save(reporte);
+    }
+    
+    public Optional<Reporte> obtenerReporte(Long id) {
+        return repositorioReportes.findById(id);
+    }
+    
+    public List<Reporte> listarReportes() {
+        return repositorioReportes.findAll();
+    }
+    
+    public List<Reporte> listarReportesPorTipo(String tipo) {
+        return repositorioReportes.findByTipo(tipo);
+    }
+    
+    public Reporte actualizarEstado(Long id, String nuevoEstado) {
+        Optional<Reporte> reporte = repositorioReportes.findById(id);
+        if (reporte.isPresent()) {
+            Reporte r = reporte.get();
+            r.setEstado(nuevoEstado);
+            return repositorioReportes.save(r);
+        }
+        return null;
+    }
+    
+    public Reporte generarReporte(Long id, String datos, Double costoGeneracion, Integer tokensUsados) {
+        Optional<Reporte> reporte = repositorioReportes.findById(id);
+        if (reporte.isPresent()) {
+            Reporte r = reporte.get();
+            r.setDatos(datos);
+            r.setCostoGeneracion(costoGeneracion);
+            r.setTokensUsados(tokensUsados);
+            r.setEstado("COMPLETADO");
+            r.setDisponible(true);
+            r.setFechaExpiracion(LocalDateTime.now().plusDays(30));
+            return repositorioReportes.save(r);
+        }
+        return null;
+    }
+    
+    // Sobrecarga para generarReporte(String tipo, String periodo)
+    public ReporteDTO generarReporte(String tipo, String periodo) {
+        Reporte reporte = crearReporte("Reporte " + tipo, tipo, periodo, "system");
+        return convertirADTO(reporte);
+    }
+    
+    public void eliminarReporte(Long id) {
+        repositorioReportes.deleteById(id);
+        log.info("Reporte {} eliminado", id);
+    }
+    
+    public List<Reporte> obtenerReportesRecientes(int limite) {
+        return repositorioReportes.findRecientes(limite);
+    }
+    
+    public List<Reporte> obtenerReportesPorUsuario(String usuario) {
+        return repositorioReportes.findByGeneradoPor(usuario);
+    }
+    
+    public List<ReporteDTO> obtenerTodosLosReportes() {
+        return repositorioReportes.findAll()
+            .stream()
+            .map(this::convertirADTO)
+            .collect(Collectors.toList());
+    }
+    
+    public byte[] generarPDF(Long id) {
+        Optional<Reporte> reporte = repositorioReportes.findById(id);
+        if (reporte.isPresent()) {
+            // Implementar generación de PDF
+            return new byte[0]; // Placeholder
+        }
+        return null;
+    }
+    
+    public byte[] generarExcel(Long id) {
+        Optional<Reporte> reporte = repositorioReportes.findById(id);
+        if (reporte.isPresent()) {
+            // Implementar generación de Excel
+            return new byte[0]; // Placeholder
+        }
+        return null;
+    }
+    
+    public ReporteDTO obtenerReportePorId(Long id) {
+        Optional<Reporte> reporte = repositorioReportes.findById(id);
+        return reporte.map(this::convertirADTO).orElse(null);
+    }
+    
+    private ReporteDTO convertirADTO(Reporte reporte) {
+        return ReporteDTO.builder()
+            .id(reporte.getId())
+            .titulo(reporte.getTitulo())
+            .tipo(reporte.getTipo())
+            .periodo(reporte.getPeriodo())
+            .estado(reporte.getEstado())
+            .fechaGeneracion(reporte.getFechaGeneracion())
+            .disponible(reporte.getDisponible())
+            .generadoPor(reporte.getGeneradoPor())
+            .build();
+    }
+}

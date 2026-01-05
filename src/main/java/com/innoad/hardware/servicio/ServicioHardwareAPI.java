@@ -1,11 +1,11 @@
 package com.innoad.hardware.servicio;
 
 import com.innoad.hardware.dto.*;
-import com.innoad.hardware.repositorio.DispositivoRepositorio;
-import com.innoad.hardware.repositorio.ContenidoRepositorio;
-import com.innoad.hardware.modelo.DispositivoIoT;
-import com.innoad.hardware.modelo.ContenidoRemoto;
-import com.innoad.hardware.modelo.EstadisticasDispositivo;
+import com.innoad.hardware.repository.DispositivoRepositorio;
+import com.innoad.hardware.repository.ContenidoRepositorio;
+import com.innoad.hardware.model.DispositivoIoT;
+import com.innoad.modules.contenidos.model.ContenidoRemoto;
+import com.innoad.hardware.model.EstadisticasDispositivo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -149,13 +149,12 @@ public class ServicioHardwareAPI {
         DispositivoIoT dispositivo = dispositivoRepositorio.findById(dispositivoId)
                 .orElseThrow();
 
-        ComandoDispositivoDTO respuesta = new ComandoDispositivoDTO();
-        respuesta.setId(UUID.randomUUID().toString());
-        respuesta.setDispositivoId(dispositivoId);
-        respuesta.setTipo(comando.getTipo());
-        respuesta.setParametros(comando.getParametros());
-        respuesta.setEstado("ejecutado");
-        respuesta.setTimestamp(LocalDateTime.now());
+        ComandoDispositivoDTO respuesta = ComandoDispositivoDTO.builder()
+                .dispositivoId(Long.valueOf(dispositivoId))
+                .tipo(comando.getTipo())
+                .descripcion(comando.getParametros() != null ? comando.getParametros().toString() : "")
+                .timestamp(LocalDateTime.now())
+                .build();
 
         // Simular ejecución según tipo de comando
         switch (comando.getTipo().toLowerCase()) {
@@ -266,7 +265,7 @@ public class ServicioHardwareAPI {
         contenido.setDescripcion(metadata.getDescripcion());
         contenido.setTipo(metadata.getTipo());
         contenido.setUrl(rutaArchivo.toString());
-        contenido.setTamaño(archivo.getSize());
+        contenido.setTamanio(archivo.getSize());
         contenido.setFechaCreacion(LocalDateTime.now());
         contenido.setEstado("programado");
         contenido.setProgreso(0);
@@ -290,7 +289,12 @@ public class ServicioHardwareAPI {
         ContenidoRemoto contenido = contenidoRepositorio.findById(contenidoId)
                 .orElseThrow();
 
-        contenido.setDispositivos(dispositivoIds);
+        // Convertir List<String> a List<Long> para setDispositivos
+        List<Long> dispositivoIdsLong = dispositivoIds.stream()
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
+        
+        contenido.setDispositivos(dispositivoIdsLong);
         if (programacion != null && !programacion.isEmpty()) {
             contenido.setProgramacion(programacion);
         }
@@ -344,22 +348,16 @@ public class ServicioHardwareAPI {
                 .orElseThrow();
 
         EstadisticasDispositivoDTO stats = new EstadisticasDispositivoDTO();
-        stats.setDispositivoId(dispositivoId);
+        stats.setDispositivoId(Long.valueOf(dispositivoId));
 
         // Simular métricas
         stats.setTiempoActividad(generateRandomInt(24, 168)); // 1-7 días
         stats.setConfiabilidad(generateRandomInt(95, 100));
-        stats.setCommandosEjecutados(generateRandomInt(50, 500));
-        stats.setAnchodeBanda(generateRandomDouble(50, 100));
+        stats.setComandosEjecutados(generateRandomInt(50, 500));
+        stats.setAnchoDeBanda(generateRandomDouble(50, 100));
         stats.setUsoCPU(generateRandomInt(10, 80));
         stats.setUsoMemoria(generateRandomInt(30, 90));
-
-        // Temperatura del sensor si existe
-        if (dispositivo.getSensores() != null && dispositivo.getSensores().containsKey("temperatura")) {
-            stats.setTemperatura(((Number) dispositivo.getSensores().get("temperatura")).doubleValue());
-        } else {
-            stats.setTemperatura(generateRandomDouble(35, 65));
-        }
+        stats.setTemperatura(generateRandomDouble(35, 65));
 
         return stats;
     }
@@ -442,7 +440,7 @@ public class ServicioHardwareAPI {
         dto.setDescripcion(contenido.getDescripcion());
         dto.setTipo(contenido.getTipo());
         dto.setUrl(contenido.getUrl());
-        dto.setTamaño(contenido.getTamaño());
+        dto.setTamanio(contenido.getTamanio());
         dto.setFechaCreacion(contenido.getFechaCreacion());
         dto.setDispositivos(contenido.getDispositivos());
         dto.setEstado(contenido.getEstado());

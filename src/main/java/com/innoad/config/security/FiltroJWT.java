@@ -1,9 +1,12 @@
 package com.innoad.config.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.innoad.exception.TooManyRequestsException;
+import com.innoad.config.jwt.ProveedorTokenJWT;
+import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
+import io.github.bucket4j.Bucket4j;
 import io.github.bucket4j.ConsumptionProbe;
+import io.github.bucket4j.Refill;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +21,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -42,7 +46,7 @@ public class FiltroJWT extends OncePerRequestFilter {
             // ==================== VERIFICAR RATE LIMIT POR IP ====================
             String clientIP = obtenerIPReal(request);
             if (!verificarRateLimit(clientIP)) {
-                response.setStatus(HttpServletResponse.SC_TOO_MANY_REQUESTS);
+                response.setStatus(429); // 429 Too Many Requests
                 response.setContentType("application/json");
                 response.getWriter().write(objectMapper.writeValueAsString(Map.of(
                     "error", "Demasiadas solicitudes desde tu IP",

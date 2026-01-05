@@ -1,8 +1,10 @@
 package com.innoad.modules.pantallas.servicio;
 
+import com.innoad.modules.auth.domain.Usuario;
 import com.innoad.modules.pantallas.dominio.Pantalla;
 import com.innoad.modules.pantallas.dto.PantallaDTO;
 import com.innoad.modules.pantallas.repositorio.RepositorioPantallas;
+import com.innoad.modules.auth.repository.RepositorioUsuario;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -11,7 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,6 +25,7 @@ import java.util.stream.Collectors;
 public class ServicioPantallas {
     
     private final RepositorioPantallas repositorioPantallas;
+    private final RepositorioUsuario repositorioUsuario;
     
     /**
      * Crear nueva pantalla
@@ -29,7 +34,7 @@ public class ServicioPantallas {
         log.info("Creando pantalla: {} para usuario: {}", dto.getCodigo(), usuarioUsername);
         
         // Validar usuario
-        Usuario usuario = repositorioUsuario.findByUsername(usuarioUsername)
+        Usuario usuario = repositorioUsuario.findByNombreUsuario(usuarioUsername)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         // Validar código único
@@ -59,7 +64,7 @@ public class ServicioPantallas {
      */
     @Transactional(readOnly = true)
     public PantallaDTO obtenerPantalla(Long id, String usuarioUsername) {
-        Usuario usuario = repositorioUsuario.findByUsername(usuarioUsername)
+        Usuario usuario = repositorioUsuario.findByNombreUsuario(usuarioUsername)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         Pantalla pantalla = repositorioPantallas.findByIdAndUsuarioId(id, usuario.getId())
@@ -73,7 +78,7 @@ public class ServicioPantallas {
      */
     @Transactional(readOnly = true)
     public Page<PantallaDTO> listarPantallas(String usuarioUsername, Pageable pageable) {
-        Usuario usuario = repositorioUsuario.findByUsername(usuarioUsername)
+        Usuario usuario = repositorioUsuario.findByNombreUsuario(usuarioUsername)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         return repositorioPantallas.findByUsuarioIdOrderByFechaCreacionDesc(usuario.getId(), pageable)
@@ -85,7 +90,7 @@ public class ServicioPantallas {
      */
     @Transactional(readOnly = true)
     public Page<PantallaDTO> buscarPorNombre(String usuarioUsername, String nombre, Pageable pageable) {
-        Usuario usuario = repositorioUsuario.findByUsername(usuarioUsername)
+        Usuario usuario = repositorioUsuario.findByNombreUsuario(usuarioUsername)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         return repositorioPantallas.findByUsuarioIdAndNombreContainingIgnoreCaseOrderByFechaCreacionDesc(usuario.getId(), nombre, pageable)
@@ -98,7 +103,7 @@ public class ServicioPantallas {
     public PantallaDTO actualizarPantalla(Long id, PantallaDTO dto, String usuarioUsername) {
         log.info("Actualizando pantalla: {}", id);
         
-        Usuario usuario = repositorioUsuario.findByUsername(usuarioUsername)
+        Usuario usuario = repositorioUsuario.findByNombreUsuario(usuarioUsername)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         Pantalla pantalla = repositorioPantallas.findByIdAndUsuarioId(id, usuario.getId())
@@ -123,7 +128,7 @@ public class ServicioPantallas {
     public PantallaDTO cambiarEstado(Long id, String nuevoEstado, String usuarioUsername) {
         log.info("Cambiando estado de pantalla {} a: {}", id, nuevoEstado);
         
-        Usuario usuario = repositorioUsuario.findByUsername(usuarioUsername)
+        Usuario usuario = repositorioUsuario.findByNombreUsuario(usuarioUsername)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         Pantalla pantalla = repositorioPantallas.findByIdAndUsuarioId(id, usuario.getId())
@@ -161,7 +166,7 @@ public class ServicioPantallas {
     public void eliminarPantalla(Long id, String usuarioUsername) {
         log.info("Eliminando pantalla: {}", id);
         
-        Usuario usuario = repositorioUsuario.findByUsername(usuarioUsername)
+        Usuario usuario = repositorioUsuario.findByNombreUsuario(usuarioUsername)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         Pantalla pantalla = repositorioPantallas.findByIdAndUsuarioId(id, usuario.getId())
@@ -176,7 +181,7 @@ public class ServicioPantallas {
      */
     @Transactional(readOnly = true)
     public List<PantallaDTO> getPantallasConectadas(String usuarioUsername) {
-        Usuario usuario = repositorioUsuario.findByUsername(usuarioUsername)
+        Usuario usuario = repositorioUsuario.findByNombreUsuario(usuarioUsername)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         return repositorioPantallas.findPantallasConectadas(usuario.getId())
@@ -190,12 +195,52 @@ public class ServicioPantallas {
      */
     @Transactional(readOnly = true)
     public Page<PantallaDTO> listarPorEstado(String usuarioUsername, String estado, Pageable pageable) {
-        Usuario usuario = repositorioUsuario.findByUsername(usuarioUsername)
+        Usuario usuario = repositorioUsuario.findByNombreUsuario(usuarioUsername)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
         Pantalla.EstadoPantalla estadoEnum = Pantalla.EstadoPantalla.valueOf(estado.toUpperCase());
         
         return repositorioPantallas.findByUsuarioIdAndEstadoOrderByFechaCreacionDesc(usuario.getId(), estadoEnum, pageable)
             .map(PantallaDTO::fromEntity);
+    }
+    
+    /**
+     * Obtener pantalla por código (para Raspberry Pi)
+     */
+    @Transactional(readOnly = true)
+    public PantallaDTO obtenerPantallaPorCodigo(String codigo) {
+        log.info("Obteniendo pantalla por código: {}", codigo);
+        
+        Pantalla pantalla = repositorioPantallas.findByCodigo(codigo)
+            .orElseThrow(() -> new IllegalArgumentException("Pantalla no encontrada con código: " + codigo));
+        
+        return PantallaDTO.fromEntity(pantalla);
+    }
+    
+    /**
+     * Obtener contenido/campaña de una pantalla por código (para Raspberry Pi)
+     */
+    @Transactional(readOnly = true)
+    public Object obtenerContenidoPantalla(String codigo) {
+        log.info("Obteniendo contenido de pantalla: {}", codigo);
+        
+        Pantalla pantalla = repositorioPantallas.findByCodigo(codigo)
+            .orElseThrow(() -> new IllegalArgumentException("Pantalla no encontrada con código: " + codigo));
+        
+        // Retornar datos de la campaña actual o estructura de contenido
+        Map<String, Object> respuesta = new HashMap<>();
+        respuesta.put("pantalla", PantallaDTO.fromEntity(pantalla));
+        respuesta.put("campanaActual", pantalla.getCampanaActual() != null ? 
+            Map.of(
+                "id", pantalla.getCampanaActual().getId(),
+                "nombre", pantalla.getCampanaActual().getNombre(),
+                "estado", pantalla.getCampanaActual().getEstado()
+            ) : null
+        );
+        respuesta.put("estado", pantalla.getEstado());
+        respuesta.put("conectada", pantalla.getConectada());
+        respuesta.put("ultimaActualizacion", pantalla.getFechaActualizacion());
+        
+        return respuesta;
     }
 }

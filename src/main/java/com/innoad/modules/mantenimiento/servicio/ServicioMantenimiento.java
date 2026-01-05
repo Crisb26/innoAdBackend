@@ -116,7 +116,7 @@ public class ServicioMantenimiento {
         var usuario = repositorioUsuario.findByEmail(usuarioEmail)
             .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         
-        if (!usuario.getRol().getNombre().equals("ADMIN")) {
+        if (!usuario.getRol().equals("ADMIN") && !usuario.getRol().name().equals("ADMINISTRADOR")) {
             throw new IllegalArgumentException("Solo los administradores pueden actualizar mantenimiento");
         }
         

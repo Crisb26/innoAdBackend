@@ -138,6 +138,7 @@ public class Pago implements Serializable {
         PENDIENTE,
         PROCESANDO,
         APROBADO,
+        AUTORIZADO,
         RECHAZADO,
         REEMBOLSADO,
         FALLIDO,

@@ -36,7 +36,7 @@ public class ControladorWebSocketAlertas {
      */
     @MessageMapping("/alertas/criticas/suscribir")
     @SendTo("/topic/alertas/criticas")
-    public List<AlertaDTO> suscribirse AAlertasCriticas() {
+    public List<AlertaDTO> suscribirseAAlertasCriticas() {
         log.info("Cliente suscrito a alertas críticas en tiempo real");
         return servicioAlerta.obtenerAlertasCriticas();
     }

@@ -1,6 +1,6 @@
 package com.innoad.modules.chat.dominio;
 
-import com.innoad.modules.auth.dominio.Usuario;
+import com.innoad.modules.auth.domain.Usuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

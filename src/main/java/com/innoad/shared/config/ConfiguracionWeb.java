@@ -19,9 +19,9 @@ public class ConfiguracionWeb implements WebMvcConfigurer {
     @Value("${innoad.storage.directory:uploads}")
     private String directorioAlmacenamiento;
 
-    private final InterceptorRateLimiting interceptorRateLimiting;
+    private final InterceptorRateLimitingHandlerImpl interceptorRateLimiting;
 
-    public ConfiguracionWeb(InterceptorRateLimiting interceptorRateLimiting) {
+    public ConfiguracionWeb(InterceptorRateLimitingHandlerImpl interceptorRateLimiting) {
         this.interceptorRateLimiting = interceptorRateLimiting;
     }
 

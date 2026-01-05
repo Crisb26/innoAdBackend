@@ -2,6 +2,7 @@ package com.innoad.modules.admin.service;
 
 import com.innoad.modules.admin.domain.ConexionUsuario;
 import com.innoad.modules.admin.dto.ConexionUsuarioDTO;
+import com.innoad.modules.admin.dto.ConexionesEstadisticasDTO;
 import com.innoad.modules.admin.repository.ConexionUsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

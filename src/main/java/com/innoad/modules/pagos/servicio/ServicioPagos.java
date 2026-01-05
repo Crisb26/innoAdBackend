@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.math.BigDecimal;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -62,14 +63,13 @@ public class ServicioPagos {
             PreferenceItemRequest item = PreferenceItemRequest.builder()
                 .id(UUID.randomUUID().toString())
                 .title(descripcion)
-                .quantity(1L)
-                .unitPrice(monto)
+                .quantity(1)
+                .unitPrice(new BigDecimal(monto.toString()))
                 .build();
             
             // Crear preference request
             PreferenceRequest preferenceRequest = PreferenceRequest.builder()
                 .items(List.of(item))
-                .payerEmail(email)
                 .externalReference(UUID.randomUUID().toString())
                 .build();
             

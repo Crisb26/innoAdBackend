@@ -183,6 +183,42 @@ public class ControladorPantallas {
         }
     }
     
+    /**
+     * Obtener pantalla por código (para Raspberry Pi)
+     */
+    @GetMapping("/codigo/{codigo}")
+    @Operation(summary = "Obtener pantalla por código")
+    public ResponseEntity<?> obtenerPantallaPorCodigo(
+            @PathVariable String codigo
+    ) {
+        try {
+            log.info("Obteniendo pantalla con código: {}", codigo);
+            PantallaDTO pantalla = servicioPantallas.obtenerPantallaPorCodigo(codigo);
+            return buildSuccessResponse(HttpStatus.OK, "Pantalla obtenida", pantalla);
+        } catch (Exception e) {
+            log.error("Error al obtener pantalla por código", e);
+            return buildErrorResponse(HttpStatus.NOT_FOUND, e.getMessage());
+        }
+    }
+    
+    /**
+     * Obtener contenido/feed de una pantalla por código (para Raspberry Pi)
+     */
+    @GetMapping("/codigo/{codigo}/contenido")
+    @Operation(summary = "Obtener contenido/campaña de una pantalla")
+    public ResponseEntity<?> obtenerContenidoPantalla(
+            @PathVariable String codigo
+    ) {
+        try {
+            log.info("Obteniendo contenido de pantalla: {}", codigo);
+            Object contenido = servicioPantallas.obtenerContenidoPantalla(codigo);
+            return buildSuccessResponse(HttpStatus.OK, "Contenido obtenido", contenido);
+        } catch (Exception e) {
+            log.error("Error al obtener contenido de pantalla", e);
+            return buildErrorResponse(HttpStatus.NOT_FOUND, e.getMessage());
+        }
+    }
+    
     // Métodos auxiliares
     private ResponseEntity<?> buildSuccessResponse(HttpStatus status, String message, Object data) {
         Map<String, Object> response = new HashMap<>();

@@ -61,7 +61,7 @@ public class ValidadorEntrada {
     /**
      * Detecta intentos de SQL Injection
      */
-    public boolean contieneSQL Injection(String input) {
+    public boolean contieneSQLInjection(String input) {
         if (input == null) {
             return false;
         }

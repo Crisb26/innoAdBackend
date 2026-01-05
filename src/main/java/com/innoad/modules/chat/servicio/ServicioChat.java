@@ -1,7 +1,7 @@
 package com.innoad.modules.chat.servicio;
 
-import com.innoad.modules.auth.dominio.Usuario;
-import com.innoad.modules.auth.repositorio.RepositorioUsuario;
+import com.innoad.modules.auth.domain.Usuario;
+import com.innoad.modules.auth.repository.RepositorioUsuario;
 import com.innoad.modules.chat.dominio.ChatUsuario;
 import com.innoad.modules.chat.dominio.MensajeChat;
 import com.innoad.modules.chat.dominio.SolicitudChatTecnico;

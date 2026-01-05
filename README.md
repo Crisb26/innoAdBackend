@@ -2,16 +2,19 @@
 
 API REST para gestión de campañas publicitarias con autenticación JWT, IA integrada, sistema de roles y pantallas digitales.
 
+**Versión:** 2.0.0 | **Estado:** Compilado con nuevos endpoints de Raspberry Pi | **Fecha:** 4 Enero 2026
+
 ## 🛠️ Stack Tecnológico
 
 | Componente | Versión |
 |-----------|---------|
 | Spring Boot | 3.5.8 |
-| Java | 21 |
+| Java | 21 LTS (--enable-preview activado) |
 | PostgreSQL | 17.6 (Azure) |
 | Maven | 3.9.x |
 | Seguridad | Spring Security + JWT (BCrypt 12 rounds) |
 | Documentación | Swagger/OpenAPI 3.0 |
+| WebSocket | spring-boot-starter-websocket (disponible) |
 
 ## 📋 Requisitos
 
@@ -102,17 +105,27 @@ src/main/java/com/innoad/modules/
 
 ## 📡 Endpoints Principales
 
-| Método | Ruta | Descripción |
-|--------|------|-------------|
-| POST | `/api/auth/register` | Registrar usuario |
-| POST | `/api/auth/login` | Autenticación |
-| GET | `/api/campanas` | Listar campañas |
-| POST | `/api/campanas` | Crear campaña |
-| GET | `/api/pantallas` | Listar pantallas |
-| GET | `/api/mantenimiento/estado` | Estado del sistema |
-| POST | `/api/mantenimiento/activar` | Activar mantenimiento |
-| GET | `/api/roles` | Listar roles |
-| POST | `/api/roles` | Crear rol personalizado |
+| Método | Ruta | Descripción | Autenticación |
+|--------|------|-------------|---------|
+| POST | `/api/auth/register` | Registrar usuario | No |
+| POST | `/api/auth/login` | Autenticación | No |
+| GET | `/api/campanas` | Listar campañas | JWT |
+| POST | `/api/campanas` | Crear campaña | JWT |
+| GET | `/api/pantallas` | Listar pantallas | JWT |
+| GET | `/api/pantallas/{id}` | Obtener pantalla | JWT |
+| **GET** | **`/api/v1/pantallas/codigo/{codigo}`** | **Obtener pantalla por código (Raspberry Pi)** | **No** |
+| **GET** | **`/api/v1/pantallas/codigo/{codigo}/contenido`** | **Obtener campaña/contenido actual (Raspberry Pi)** | **No** |
+| GET | `/api/mantenimiento/estado` | Estado del sistema | JWT |
+| POST | `/api/mantenimiento/activar` | Activar mantenimiento | JWT |
+| GET | `/api/roles` | Listar roles | JWT |
+| POST | `/api/roles` | Crear rol personalizado | JWT |
+
+### 🆕 Endpoints para Raspberry Pi (v1)
+
+Los nuevos endpoints `GET /api/v1/pantallas/codigo/{codigo}` y `GET /api/v1/pantallas/codigo/{codigo}/contenido` permiten que dispositivos Raspberry Pi:
+- Consulten su configuración sin autenticación JWT
+- Obtengan el contenido actual asignado via polling (recomendado cada 30 segundos)
+- Reciban información en tiempo real sin cargar JWT
 
 ## 🗄️ Base de Datos
 
