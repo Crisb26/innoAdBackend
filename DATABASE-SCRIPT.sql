@@ -1036,7 +1036,6 @@ FOR EACH ROW EXECUTE FUNCTION verificar_sesiones_usuario();
 INSERT INTO roles (nombre, descripcion) VALUES
 ('ROLE_ADMIN', 'Administrador del sistema con acceso completo'),
 ('ROLE_TECNICO', 'Técnico con permisos de configuración'),
-('ROLE_DEVELOPER', 'Desarrollador con acceso a herramientas'),
 ('ROLE_USUARIO', 'Usuario estándar')
 ON CONFLICT (nombre) DO NOTHING;
 
@@ -1082,15 +1081,6 @@ AND p.nombre IN (
 )
 ON CONFLICT DO NOTHING;
 
-INSERT INTO rol_permisos (rol_id, permiso_id)
-SELECT r.id, p.id FROM roles r, permisos p 
-WHERE r.nombre = 'ROLE_DEVELOPER'
-AND p.nombre IN (
-    'campanas.ver', 'contenidos.ver', 'contenidos.crear',
-    'pantallas.ver', 'estadisticas.ver', 'sistema.logs',
-    'ia.usar', 'ia.configurar'
-)
-ON CONFLICT DO NOTHING;
 
 INSERT INTO rol_permisos (rol_id, permiso_id)
 SELECT r.id, p.id FROM roles r, permisos p 
@@ -1110,10 +1100,6 @@ INSERT INTO usuarios (nombre_usuario, email, password, nombre_completo, activo, 
 ON CONFLICT (nombre_usuario) DO NOTHING;
 
 INSERT INTO usuarios (nombre_usuario, email, password, nombre_completo, activo, verificado) VALUES
-('dev', 'dev@innoad.com', '$2a$10$N9qo8uLOiCkgX2ZMROZOmeIjZaGcfL7P92LDGxAd68lJzDL17lhwy', 'Desarrollador', true, true)
-ON CONFLICT (nombre_usuario) DO NOTHING;
-
-INSERT INTO usuarios (nombre_usuario, email, password, nombre_completo, activo, verificado) VALUES
 ('usuario', 'usuario@innoad.com', '$2a$10$N9qo8uLOiCkgX2ZMROZOmeIjZaGcfL7P92LDGxAd68lJzDL17lhwy', 'Usuario Estándar', true, true)
 ON CONFLICT (nombre_usuario) DO NOTHING;
 
@@ -1125,9 +1111,6 @@ INSERT INTO usuario_roles (usuario_id, rol_id)
 SELECT u.id, r.id FROM usuarios u, roles r WHERE u.nombre_usuario = 'tecnico' AND r.nombre = 'ROLE_TECNICO'
 ON CONFLICT DO NOTHING;
 
-INSERT INTO usuario_roles (usuario_id, rol_id)
-SELECT u.id, r.id FROM usuarios u, roles r WHERE u.nombre_usuario = 'dev' AND r.nombre = 'ROLE_DEVELOPER'
-ON CONFLICT DO NOTHING;
 
 INSERT INTO usuario_roles (usuario_id, rol_id)
 SELECT u.id, r.id FROM usuarios u, roles r WHERE u.nombre_usuario = 'usuario' AND r.nombre = 'ROLE_USUARIO'
