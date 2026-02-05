@@ -88,6 +88,10 @@ mercado-pago:
   client-id: ${MERCADO_PAGO_CLIENT_ID:}
   client-secret: ${MERCADO_PAGO_CLIENT_SECRET:}
 
+# Configuración de JWT
+jwt:
+  secret: ${JWT_SECRET:MiClaveSecretaSuperSeguraParaInnoAdQueDebeSerMuyLarga2024!@#$%^&*()}
+
 # Configuración de aplicación
 app:
   name: InnoAd Signage Platform
