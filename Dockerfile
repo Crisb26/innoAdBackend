@@ -9,12 +9,16 @@ WORKDIR /workspace
 COPY pom.xml ./
 COPY src ./src
 
+# Add a custom settings.xml (if provided in the repo) to improve mirror/retry behavior
+COPY settings.xml /root/.m2/settings.xml
+
 # Build the application with limited memory usage and no update checks
-# -XX:MaxRAMPercentage=80.0 limits heap to 80% of container memory
-RUN mvn -B -DskipTests package -DskipITs --no-transfer-progress \
+# Add retry handler property via -D to help transient network issues during dependency download
+RUN mvn -B -s /root/.m2/settings.xml -DskipTests package -DskipITs --no-transfer-progress \
     -Dmaven.compiler.fork=true \
     -Dmaven.compiler.meminitial=128m \
-    -Dmaven.compiler.maxmem=512m
+    -Dmaven.compiler.maxmem=512m \
+    -Dmaven.wagon.http.retryHandler.count=3
 
 FROM eclipse-temurin:21-jre-jammy
 

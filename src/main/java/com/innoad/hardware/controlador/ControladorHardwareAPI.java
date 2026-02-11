@@ -307,9 +307,7 @@ public class ControladorHardwareAPI {
             log.info("POST /api/hardware/contenido/{}/asignar", contenidoId);
 
             @SuppressWarnings("unchecked")
-            @SuppressWarnings("unchecked")
             List<String> dispositivoIds = (List<String>) payload.get("dispositivoIds");
-            @SuppressWarnings("unchecked")
             Map<String, Object> programacion = (Map<String, Object>) payload.get("programacion");
 
             ContenidoDTO resultado = servicio.asignarContenidoADispositivos(String.valueOf(contenidoId), dispositivoIds, programacion);

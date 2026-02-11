@@ -279,11 +279,17 @@ public class ServicioHardwareAPI {
     /**
      * Asignar contenido a dispositivos
      */
-    public ContenidoDTO asignarContenidoADispositivos(
-            String contenidoId,
-            List<String> dispositivoIds,
-            Map<String, Object> programacion) {
+            public ContenidoDTO asignarContenidoADispositivos(
+                String contenidoId,
+                Object dispositivoIdsObj,
+                Object programacionObj) {
 
+        List<String> dispositivoIds = new ArrayList<>();
+        if (dispositivoIdsObj instanceof List) {
+            @SuppressWarnings("unchecked")
+            List<String> tmp = (List<String>) dispositivoIdsObj;
+            dispositivoIds.addAll(tmp);
+        }
         log.info("Asignando contenido {} a {} dispositivos", contenidoId, dispositivoIds.size());
 
         ContenidoRemoto contenido = contenidoRepositorio.findById(contenidoId)
@@ -291,12 +297,20 @@ public class ServicioHardwareAPI {
 
         // Convertir List<String> a List<Long> para setDispositivos
         List<Long> dispositivoIdsLong = dispositivoIds.stream()
-                .map(Long::parseLong)
-                .collect(Collectors.toList());
+            .map(id -> {
+                try { return Long.parseLong(id); } catch (Exception e) { return null; }
+            })
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
         
         contenido.setDispositivos(dispositivoIdsLong);
-        if (programacion != null && !programacion.isEmpty()) {
-            contenido.setProgramacion(programacion);
+        // Aceptar tanto Map como null; algunos clientes pueden enviar estructuras distintas
+        if (programacionObj instanceof Map) {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> programacion = (Map<String, Object>) programacionObj;
+            if (!programacion.isEmpty()) {
+                contenido.setProgramacion(programacion);
+            }
         }
         contenido.setEstado("en_ejecucion");
 

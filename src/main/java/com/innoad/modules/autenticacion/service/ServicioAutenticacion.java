@@ -3,11 +3,21 @@ package com.innoad.modules.autenticacion.service;
 import com.innoad.modules.autenticacion.dto.LoginRequest;
 import com.innoad.modules.autenticacion.dto.LoginResponse;
 import com.innoad.modules.autenticacion.dto.RegistroRequest;
+import com.innoad.modules.autenticacion.dto.SolicitudRecuperarContrasena;
+import com.innoad.modules.autenticacion.dto.SolicitudRestablecerContrasena;
+import com.innoad.modules.auth.repository.RepositorioUsuario;
+import com.innoad.modules.auth.domain.Usuario;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Servicio de Autenticación - Gestión de login, registro y JWT
@@ -18,7 +28,15 @@ import java.util.Optional;
 public class ServicioAutenticacion {
 
     private final PasswordEncoder passwordEncoder;
-    // Otros inyectables se agregarán aquí
+    private final RepositorioUsuario repositorioUsuario;
+    private final JavaMailSender mailSender;
+
+    @Value("${innoad.frontend.url:http://localhost:4200}")
+    private String frontendUrl;
+
+    // Token expiración (horas)
+    @Value("${innoad.recovery.token-expiration-hours:2}")
+    private long tokenExpirationHours;
 
     /**
      * Authenticate user with email and password
@@ -89,6 +107,65 @@ public class ServicioAutenticacion {
      */
     public LoginResponse autenticar(LoginRequest request) {
         return login(request);
+    }
+
+    /**
+     * Solicita recuperación de contraseña: genera token, guarda y envía email.
+     */
+    public void solicitarRecuperacion(SolicitudRecuperarContrasena solicitud) {
+        log.info("Solicitud de recuperación para: {}", solicitud.getEmail());
+
+        Optional<Usuario> usuarioOpt = repositorioUsuario.findByEmail(solicitud.getEmail());
+        if (usuarioOpt.isEmpty()) {
+            // No revelar existencia del email
+            log.info("Email no encontrado (se responde OK para evitar enumeración): {}", solicitud.getEmail());
+            return;
+        }
+
+        Usuario usuario = usuarioOpt.get();
+        String token = UUID.randomUUID().toString();
+        usuario.setTokenRecuperacion(token);
+        usuario.setTokenRecuperacionExpiracion(LocalDateTime.now().plusHours(tokenExpirationHours));
+        repositorioUsuario.save(usuario);
+
+        // Enviar email con enlace de restablecimiento
+        String link = frontendUrl + "/autenticacion/restablecer?token=" + token;
+        SimpleMailMessage msg = new SimpleMailMessage();
+        msg.setTo(usuario.getEmail());
+        msg.setSubject("Restablece tu contraseña - InnoAd");
+        msg.setText("Hola " + usuario.getNombre() + ",\n\n" +
+                "Hemos recibido una solicitud para restablecer tu contraseña. Haz clic en el enlace o pégalo en tu navegador:\n\n" +
+                link + "\n\n" +
+                "Si no solicitaste este cambio, puedes ignorar este correo.\n\n" +
+                "Saludos,\nInnoAd");
+
+        try {
+            mailSender.send(msg);
+        } catch (Exception e) {
+            log.error("Error enviando email de recuperación: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * Restablece la contraseña usando token válido
+     */
+    public void restablecerContrasena(SolicitudRestablecerContrasena solicitud) {
+        log.info("Restablecer contraseña con token: {}", solicitud.getToken());
+
+        Optional<Usuario> usuarioOpt = repositorioUsuario.findByTokenRecuperacion(solicitud.getToken());
+        if (usuarioOpt.isEmpty()) {
+            throw new IllegalArgumentException("Token inválido");
+        }
+
+        Usuario usuario = usuarioOpt.get();
+        if (usuario.getTokenRecuperacionExpiracion() == null || usuario.getTokenRecuperacionExpiracion().isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Token expirado");
+        }
+
+        usuario.setContrasena(passwordEncoder.encode(solicitud.getNuevaContrasena()));
+        usuario.setTokenRecuperacion(null);
+        usuario.setTokenRecuperacionExpiracion(null);
+        repositorioUsuario.save(usuario);
     }
 
     /**

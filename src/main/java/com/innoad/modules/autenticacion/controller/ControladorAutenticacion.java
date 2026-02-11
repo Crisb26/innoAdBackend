@@ -14,6 +14,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.innoad.modules.autenticacion.dto.SolicitudRecuperarContrasena;
+import com.innoad.modules.autenticacion.dto.SolicitudRestablecerContrasena;
 
 @RestController
 @RequestMapping("/api/autenticacion")
@@ -75,5 +77,17 @@ public class ControladorAutenticacion {
             public final String estado = "FUNCIONANDO";
             public final long timestamp = System.currentTimeMillis();
         });
+    }
+
+    @PostMapping("/recuperar")
+    public ResponseEntity<?> solicitarRecuperacion(@RequestBody SolicitudRecuperarContrasena solicitud) {
+        servicioAutenticacion.solicitarRecuperacion(solicitud);
+        return ResponseEntity.ok().body("Si el email existe, se enviaron instrucciones para restablecer la contraseña.");
+    }
+
+    @PostMapping("/restablecer")
+    public ResponseEntity<?> restablecerContrasena(@RequestBody SolicitudRestablecerContrasena solicitud) {
+        servicioAutenticacion.restablecerContrasena(solicitud);
+        return ResponseEntity.ok().body("Contraseña restablecida correctamente.");
     }
 }
