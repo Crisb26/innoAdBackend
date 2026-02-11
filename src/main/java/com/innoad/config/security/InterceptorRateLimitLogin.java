@@ -2,6 +2,7 @@ package com.innoad.config.security;
 
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.ConsumptionProbe;
+import java.util.concurrent.TimeUnit;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +28,7 @@ public class InterceptorRateLimitLogin implements HandlerInterceptor {
             ConsumptionProbe probe = loginRateLimiter.tryConsumeAndReturnRemaining(1);
             
             if (!probe.isConsumed()) {
-                long segundosFaltantes = probe.getSecondsToWait();
+                long segundosFaltantes = TimeUnit.NANOSECONDS.toSeconds(probe.getNanosToWaitForRefill());
                 
                 log.warn("Rate limit excedido en login desde IP: {}", clientIP);
                 

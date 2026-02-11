@@ -27,8 +27,8 @@ public class BaseConocimientoInnoAd {
         
         informacionBasica.put("TARIFAS",
             "Nuestros planes son flexibles:\n" +
-            "• PLAN BÁSICO: $49/mes - Hasta 5 campañas, análisis básico, soporte por email\n" +
-            "• PLAN PROFESIONAL: $149/mes - Hasta 20 campañas, análisis avanzado, IA generativa, soporte prioritario\n" +
+            "• PLAN BÁSICO: $178.000/mes - Hasta 5 campañas, análisis básico, soporte por email\n" +
+            "• PLAN PROFESIONAL: $542.000/mes - Hasta 20 campañas, análisis avanzado, IA generativa, soporte prioritario\n" +
             "• PLAN EMPRESARIAL: Personalizado - Campañas ilimitadas, IA personalizada, API, soporte 24/7\n" +
             "Primer mes 50% de descuento. Todos los planes incluyen 30 días de prueba gratis.");
         
