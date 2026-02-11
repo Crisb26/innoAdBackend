@@ -12,7 +12,7 @@ import org.springframework.web.socket.server.support.HttpSessionHandshakeInterce
  * Habilita STOMP (Simple Text Oriented Messaging Protocol)
  * sobre WebSocket para mensajería bidireccional
  */
-@Configuration
+@Configuration("configuracionWebSocketShared")
 @EnableWebSocketMessageBroker
 public class ConfiguracionWebSocket implements WebSocketMessageBrokerConfigurer {
     

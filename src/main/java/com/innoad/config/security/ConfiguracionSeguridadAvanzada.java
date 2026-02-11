@@ -5,6 +5,7 @@ import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Bucket4j;
 import io.github.bucket4j.Refill;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -28,6 +29,7 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class ConfiguracionSeguridadAvanzada {
     
+    @Lazy
     private final FiltroJWT filtroJWT;
     private final GestorExcepcionesSeguridad gestorExcepciones;
     

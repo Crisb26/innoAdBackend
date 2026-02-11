@@ -2,10 +2,32 @@ package com.innoad;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+@EntityScan(basePackages = {
+    "com.innoad.mantenimiento",
+    "com.innoad.roles",
+    
+    "com.innoad.modules.contenidos.model",
+    "com.innoad.modules.ubicaciones.model",
+    "com.innoad.modules.reportes.modelo",
+    "com.innoad.modules.publicaciones.model",
+    "com.innoad.modules.pantallas.dominio",
+    "com.innoad.modules.pagos.dominio",
+    "com.innoad.modules.contenidos.dominio",
+    "com.innoad.modules.ia.domain",
+    "com.innoad.modules.mantenimiento.dominio",
+    "com.innoad.modules.campanas.dominio",
+    "com.innoad.modules.chat.dominio",
+    "com.innoad.hardware.model",
+    "com.innoad.modules.auth.domain",
+    "com.innoad.modules.admin.domain",
+    "com.innoad.modules.publicaciones.model",
+    "com.innoad.modules.reportes.modelo"
+})
 @SpringBootApplication(scanBasePackages = "com.innoad")
 @EnableCaching
 @EnableAsync
@@ -13,6 +35,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class InnoAdApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(InnoAdApplication.class, args);
+        SpringApplication app = new SpringApplication(InnoAdApplication.class);
+        app.setAllowBeanDefinitionOverriding(true);
+        app.run(args);
     }
 }

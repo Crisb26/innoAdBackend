@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
+@RestController("controladorAutenticacionAutenticacion")
 @RequestMapping("/api/autenticacion")
 @RequiredArgsConstructor
 @Tag(name = "🔐 Autenticación", description = "Endpoints para login, registro y gestión de tokens")

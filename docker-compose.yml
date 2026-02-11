@@ -36,6 +36,8 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/innoad_db
       - SPRING_DATASOURCE_USERNAME=innoad
       - SPRING_DATASOURCE_PASSWORD=innoad_password_segura_2024
+      - SPRING_MAIN_ALLOW_BEAN_DEFINITION_OVERRIDING=true
+      - JAVA_TOOL_OPTIONS=-Dspring.main.allow-bean-definition-overriding=true
       - SPRING_MAIL_USERNAME=noreply@innoad.com
       - SPRING_MAIL_PASSWORD=password123
       - INNOAD_FRONTEND_URL=http://localhost:3000
