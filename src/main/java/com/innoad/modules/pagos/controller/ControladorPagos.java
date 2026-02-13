@@ -1,10 +1,7 @@
 package com.innoad.modules.pagos.controller;
 
-import com.innoad.modules.pagos.dominio.Reembolso;
 import com.innoad.modules.pagos.dto.PagoDTO;
-import com.innoad.modules.pagos.dto.ReembolsoDTO;
 import com.innoad.modules.pagos.servicio.ServicioPagos;
-import com.innoad.modules.pagos.servicio.ServicioReembolsos;
 import com.innoad.modules.pagos.servicio.ServicioWebhookMercadoPago;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -38,7 +35,6 @@ public class ControladorPagos {
     
     private final ServicioPagos servicioPagos;
     private final ServicioWebhookMercadoPago servicioWebhook;
-    private final ServicioReembolsos servicioReembolsos;
     
     /**
      * Crear nuevo pago
@@ -199,157 +195,6 @@ public class ControladorPagos {
         } catch (Exception e) {
             log.error("Error al reembolsar pago", e);
             return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
-    }
-    
-    /**
-     * Solicitar reembolso (USUARIO)
-     */
-    @PostMapping("/reembolsos/solicitar")
-    @Operation(summary = "Solicitar reembolso de pago")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> solicitarReembolso(
-            @RequestBody Map<String, Object> solicitud,
-            Authentication authentication
-    ) {
-        try {
-            Long pagoId = Long.valueOf(solicitud.get("pagoId").toString());
-            String motivo = solicitud.get("motivo").toString();
-            String descripcion = solicitud.getOrDefault("descripcion", "").toString();
-            BigDecimal monto = new BigDecimal(solicitud.getOrDefault("monto", "0").toString());
-            
-            // En producción, obtener usuarioId del authentication
-            Long usuarioId = 1L; // Por ahora hardcoded
-            String email = "usuario@example.com"; // Por ahora hardcoded
-            
-            ReembolsoDTO reembolso = servicioReembolsos.solicitarReembolso(
-                pagoId,
-                usuarioId,
-                email,
-                Reembolso.MotivoReembolso.valueOf(motivo),
-                descripcion,
-                monto
-            );
-            
-            return buildSuccessResponse(HttpStatus.CREATED, "Reembolso solicitado exitosamente", reembolso);
-        } catch (Exception e) {
-            log.error("Error al solicitar reembolso", e);
-            return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
-    }
-    
-    /**
-     * Listar reembolsos del usuario
-     */
-    @GetMapping("/reembolsos")
-    @Operation(summary = "Listar reembolsos del usuario")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> listarReembolsos(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            Authentication authentication
-    ) {
-        try {
-            Long usuarioId = 1L; // En producción, obtener del authentication
-            Pageable pageable = PageRequest.of(page, size);
-            Page<ReembolsoDTO> reembolsos = servicioReembolsos.listarReembolsosUsuario(usuarioId, pageable);
-            
-            return buildSuccessResponse(HttpStatus.OK, "Reembolsos obtenidos", reembolsos);
-        } catch (Exception e) {
-            log.error("Error al listar reembolsos", e);
-            return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
-    }
-    
-    /**
-     * Listar reembolsos pendientes (ADMINISTRADOR)
-     */
-    @GetMapping("/admin/reembolsos/pendientes")
-    @Operation(summary = "Listar reembolsos pendientes")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
-    public ResponseEntity<?> listarReembolsosPendientes(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        try {
-            Pageable pageable = PageRequest.of(page, size);
-            Page<ReembolsoDTO> reembolsos = servicioReembolsos.obtenerReembolsosPendientes(pageable);
-            
-            return buildSuccessResponse(HttpStatus.OK, "Reembolsos pendientes obtenidos", reembolsos);
-        } catch (Exception e) {
-            log.error("Error al listar reembolsos pendientes", e);
-            return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
-    }
-    
-    /**
-     * Procesar reembolso (ADMINISTRADOR)
-     */
-    @PostMapping("/admin/reembolsos/{id}/procesar")
-    @Operation(summary = "Procesar reembolso")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
-    public ResponseEntity<?> procesarReembolso(
-            @PathVariable Long id,
-            @RequestBody Map<String, Object> solicitud,
-            Authentication authentication
-    ) {
-        try {
-            String comentario = solicitud.getOrDefault("comentario", "").toString();
-            
-            ReembolsoDTO reembolso = servicioReembolsos.procesarReembolso(
-                id,
-                authentication.getName(),
-                comentario
-            );
-            
-            return buildSuccessResponse(HttpStatus.OK, "Reembolso procesado exitosamente", reembolso);
-        } catch (Exception e) {
-            log.error("Error al procesar reembolso", e);
-            return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
-    }
-    
-    /**
-     * Rechazar reembolso (ADMINISTRADOR)
-     */
-    @PostMapping("/admin/reembolsos/{id}/rechazar")
-    @Operation(summary = "Rechazar reembolso")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
-    public ResponseEntity<?> rechazarReembolso(
-            @PathVariable Long id,
-            @RequestBody Map<String, Object> solicitud,
-            Authentication authentication
-    ) {
-        try {
-            String razonRechazo = solicitud.getOrDefault("razonRechazo", "").toString();
-            
-            ReembolsoDTO reembolso = servicioReembolsos.rechazarReembolso(
-                id,
-                razonRechazo,
-                authentication.getName()
-            );
-            
-            return buildSuccessResponse(HttpStatus.OK, "Reembolso rechazado", reembolso);
-        } catch (Exception e) {
-            log.error("Error al rechazar reembolso", e);
-            return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
-    }
-    
-    /**
-     * Obtener estadísticas de reembolsos (ADMINISTRADOR)
-     */
-    @GetMapping("/admin/reembolsos/estadisticas")
-    @Operation(summary = "Estadísticas de reembolsos")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
-    public ResponseEntity<?> obtenerEstadisticasReembolsos() {
-        try {
-            ServicioReembolsos.ReembolsoEstadisticas estadisticas = servicioReembolsos.obtenerEstadisticas();
-            
-            return buildSuccessResponse(HttpStatus.OK, "Estadísticas obtenidas", estadisticas);
-        } catch (Exception e) {
-            log.error("Error al obtener estadísticas", e);
-            return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
     
