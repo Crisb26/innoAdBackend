@@ -28,7 +28,7 @@ import java.util.UUID;
  * Servicio de autenticación para registro, login y recuperación de contraseña.
  */
 @Slf4j
-@Service
+@Service("servicioAutenticacionAuth")
 @RequiredArgsConstructor
 public class ServicioAutenticacion {
     

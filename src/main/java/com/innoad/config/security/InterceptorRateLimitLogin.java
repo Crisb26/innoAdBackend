@@ -28,9 +28,7 @@ public class InterceptorRateLimitLogin implements HandlerInterceptor {
             ConsumptionProbe probe = loginRateLimiter.tryConsumeAndReturnRemaining(1);
             
             if (!probe.isConsumed()) {
-                long nanos = probe.getNanosToWaitForRefill();
-                long segundosFaltantes = TimeUnit.NANOSECONDS.toSeconds(nanos);
-                if (segundosFaltantes <= 0) segundosFaltantes = 1;
+                long segundosFaltantes = probe.getSecondsToWait();
                 
                 log.warn("Rate limit excedido en login desde IP: {}", clientIP);
                 

@@ -33,12 +33,17 @@ WORKDIR /app
 EXPOSE 8080
 
 # Copy jar from builder stage
-COPY --from=build /workspace/target/innoad-backend-2.0.0.jar /app/innoad-backend.jar
+COPY --from=build /workspace/target/*.jar /app/innoad-backend.jar
+
+
 
 ENV JAVA_OPTS=""
 
 # Asegurar que Spring use el perfil prod si está definida la variable
 ENV SPRING_PROFILES_ACTIVE=prod
+
+ENV SPRING_MAIN_ALLOW_BEAN_DEFINITION_OVERRIDING=true
+
 
 ENTRYPOINT ["sh","-c","java $JAVA_OPTS -Dspring.profiles.active=${SPRING_PROFILES_ACTIVE:-prod} -jar /app/innoad-backend.jar"]
 

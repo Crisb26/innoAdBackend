@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import com.innoad.modules.autenticacion.dto.SolicitudRecuperarContrasena;
 import com.innoad.modules.autenticacion.dto.SolicitudRestablecerContrasena;
 
-@RestController
+@RestController("controladorAutenticacionAutenticacion")
 @RequestMapping("/api/autenticacion")
 @RequiredArgsConstructor
 @Tag(name = "🔐 Autenticación", description = "Endpoints para login, registro y gestión de tokens")
