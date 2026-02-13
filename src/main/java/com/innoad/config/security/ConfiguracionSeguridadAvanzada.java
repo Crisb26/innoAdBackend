@@ -4,8 +4,6 @@ import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Bucket4j;
 import io.github.bucket4j.Refill;
-import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -26,58 +24,52 @@ import java.util.Arrays;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@RequiredArgsConstructor
 public class ConfiguracionSeguridadAvanzada {
-    
-    @Lazy
-    private final FiltroJWT filtroJWT;
-    private final GestorExcepcionesSeguridad gestorExcepciones;
-    
+
     /**
-     * Encriptador BCrypt con fuerza máxima (12 rounds)
+     * Encriptador BCrypt
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12);
     }
-    
+
     /**
-     * Configuración de cadena de seguridad HTTP
+     * Configuración principal de seguridad
      */
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(
+            HttpSecurity http,
+            FiltroJWT filtroJWT,
+            GestorExcepcionesSeguridad gestorExcepciones
+    ) throws Exception {
+
         http
-            // ==================== CORS CONFIGURATION ====================
+            // ==================== CORS ====================
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            
-            // ==================== CSRF PROTECTION ====================
-            .csrf(csrf -> csrf.disable()) // Deshabilitado para APIs REST con JWT
-            
-            // ==================== SESSION MANAGEMENT ====================
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+
+            // ==================== CSRF ====================
+            .csrf(csrf -> csrf.disable())
+
+            // ==================== SESSION ====================
+            .sessionManagement(session ->
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
-            
-            // ==================== SECURITY HEADERS ====================
+
+            // ==================== HEADERS ====================
             .headers(headers -> headers
-                .contentSecurityPolicy(csp -> csp
-                    .policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'")
+                .contentSecurityPolicy(csp ->
+                    csp.policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'")
                 )
-                .xssProtection(xss -> xss
-                    .disable()
-                )
-                .frameOptions(frame -> frame
-                    .deny()
-                )
-                .httpStrictTransportSecurity(hsts -> hsts
-                    .includeSubDomains(true)
-                    .maxAgeInSeconds(31536000)
+                .frameOptions(frame -> frame.deny())
+                .httpStrictTransportSecurity(hsts ->
+                    hsts.includeSubDomains(true)
+                        .maxAgeInSeconds(31536000)
                 )
             )
-            
-            // ==================== ENDPOINT SECURITY ====================
+
+            // ==================== AUTHORIZATION ====================
             .authorizeHttpRequests(authz -> authz
-                // Públicos
                 .requestMatchers(
                     "/api/public/**",
                     "/api/autenticacion/registrar",
@@ -87,13 +79,10 @@ public class ConfiguracionSeguridadAvanzada {
                     "/swagger-ui/**",
                     "/v3/api-docs/**"
                 ).permitAll()
-                
-                // Admin
-                .requestMatchers(
-                    "/api/admin/**"
-                ).hasRole("ADMIN")
-                
-                // Autenticados
+
+                .requestMatchers("/api/admin/**")
+                .hasRole("ADMIN")
+
                 .requestMatchers(
                     "/api/usuario/**",
                     "/api/campanas/**",
@@ -101,84 +90,89 @@ public class ConfiguracionSeguridadAvanzada {
                     "/api/pantallas/**",
                     "/api/reportes/**"
                 ).authenticated()
-                
-                // Resto requiere autenticación
+
                 .anyRequest().authenticated()
             )
-            
+
             // ==================== JWT FILTER ====================
             .addFilterBefore(filtroJWT, UsernamePasswordAuthenticationFilter.class)
-            
+
             // ==================== EXCEPTION HANDLING ====================
-            .exceptionHandling(exceptionHandling -> exceptionHandling
-                .authenticationEntryPoint(gestorExcepciones)
+            .exceptionHandling(exception ->
+                exception.authenticationEntryPoint(gestorExcepciones)
             );
-        
+
         return http.build();
     }
-    
+
     /**
-     * CORS Configuration - Solo dominios autorizados
+     * Configuración CORS
      */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+
         CorsConfiguration config = new CorsConfiguration();
-        
-        // Solo estos orígenes pueden acceder
+
         config.setAllowedOrigins(Arrays.asList(
-            "https://innoadfrontend.netlify.app",
-            "https://localhost:4200",
-            "http://localhost:4200"
+                "https://innoadfrontend.netlify.app",
+                "http://localhost:4200",
+                "https://localhost:4200"
         ));
-        
-        // Métodos permitidos
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        
-        // Headers permitidos
+
+        config.setAllowedMethods(Arrays.asList(
+                "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"
+        ));
+
         config.setAllowedHeaders(Arrays.asList(
-            "Authorization",
-            "Content-Type",
-            "X-Requested-With",
-            "Accept",
-            "Origin",
-            "Access-Control-Request-Method",
-            "Access-Control-Request-Headers"
+                "Authorization",
+                "Content-Type",
+                "X-Requested-With",
+                "Accept",
+                "Origin"
         ));
-        
-        // Headers expuestos
+
         config.setExposedHeaders(Arrays.asList(
-            "Authorization",
-            "X-Total-Count",
-            "X-Page-Number"
+                "Authorization",
+                "X-Total-Count",
+                "X-Page-Number"
         ));
-        
+
         config.setAllowCredentials(true);
-        config.setMaxAge(3600L); // 1 hora de caché
-        
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        config.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+
         source.registerCorsConfiguration("/**", config);
+
         return source;
     }
-    
+
     /**
-     * Rate Limiter para login - 5 intentos cada 15 minutos
+     * Rate limiter login
      */
     @Bean(name = "loginRateLimiter")
     public Bucket loginRateLimiter() {
-        Bandwidth limit = Bandwidth.classic(5, Refill.intervally(5, Duration.ofMinutes(15)));
+        Bandwidth limit =
+                Bandwidth.classic(5,
+                        Refill.intervally(5, Duration.ofMinutes(15)));
+
         return Bucket4j.builder()
-            .addLimit(limit)
-            .build();
+                .addLimit(limit)
+                .build();
     }
-    
+
     /**
-     * Rate Limiter para API general - 100 requests por minuto
+     * Rate limiter API general
      */
     @Bean(name = "apiRateLimiter")
     public Bucket apiRateLimiter() {
-        Bandwidth limit = Bandwidth.classic(100, Refill.intervally(100, Duration.ofMinutes(1)));
+        Bandwidth limit =
+                Bandwidth.classic(100,
+                        Refill.intervally(100, Duration.ofMinutes(1)));
+
         return Bucket4j.builder()
-            .addLimit(limit)
-            .build();
+                .addLimit(limit)
+                .build();
     }
 }
