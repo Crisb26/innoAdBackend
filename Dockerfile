@@ -9,12 +9,15 @@ WORKDIR /workspace
 COPY pom.xml ./
 COPY src ./src
 
-# Build the application with limited memory usage and no update checks
-# -XX:MaxRAMPercentage=80.0 limits heap to 80% of container memory
-RUN mvn -B -Dmaven.test.skip=true package --no-transfer-progress \
+# Add a custom settings.xml (if provided in the repo) to improve mirror/retry behavior
+COPY settings.xml /root/.m2/settings.xml
+
+# Build the application - skip tests entirely, use custom settings.xml for mirrors/retry
+RUN mvn -B -s /root/.m2/settings.xml -Dmaven.test.skip=true package --no-transfer-progress \
     -Dmaven.compiler.fork=true \
     -Dmaven.compiler.meminitial=128m \
-    -Dmaven.compiler.maxmem=512m
+    -Dmaven.compiler.maxmem=512m \
+    -Dmaven.wagon.http.retryHandler.count=3
 
 FROM eclipse-temurin:21-jre-jammy
 
@@ -29,12 +32,17 @@ WORKDIR /app
 EXPOSE 8080
 
 # Copy jar from builder stage
-COPY --from=build /workspace/target/innoad-backend-2.0.0.jar /app/innoad-backend.jar
+COPY --from=build /workspace/target/*.jar /app/innoad-backend.jar
+
+
 
 ENV JAVA_OPTS=""
 
 # Asegurar que Spring use el perfil prod si está definida la variable
 ENV SPRING_PROFILES_ACTIVE=prod
+
+ENV SPRING_MAIN_ALLOW_BEAN_DEFINITION_OVERRIDING=true
+
 
 ENTRYPOINT ["sh","-c","java $JAVA_OPTS -Dspring.profiles.active=${SPRING_PROFILES_ACTIVE:-prod} -jar /app/innoad-backend.jar"]
 

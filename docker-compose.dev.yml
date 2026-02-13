@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    container_name: innoad-postgres
+    environment:
+      POSTGRES_DB: innoad_db
+      POSTGRES_USER: innoad
+      POSTGRES_PASSWORD: innoad_password
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: innoad-backend:dev
+    container_name: innoad-backend-dev
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - DATABASE_URL=jdbc:postgresql://db:5432/innoad_db
+      - DATABASE_USERNAME=innoad
+      - DATABASE_PASSWORD=innoad_password
+      - FRONTEND_URL=http://localhost:4200
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - innoad-network
+
+volumes:
+  postgres-data:
+
+networks:
+  innoad-network:
+    driver: bridge

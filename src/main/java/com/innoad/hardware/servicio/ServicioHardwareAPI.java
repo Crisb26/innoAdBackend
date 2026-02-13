@@ -129,10 +129,16 @@ public class ServicioHardwareAPI {
         DispositivoIoT dispositivo = dispositivoRepositorio.findById(dispositivoId)
                 .orElseThrow();
 
-        // Actualizar valores de sensores directamente en la entidad
+        // Actualizar valores de sensores directamente y en la lista transient
         dispositivo.setTemperatura(sensores.getTemperatura());
         dispositivo.setHumedad(sensores.getHumedad());
-        // Nota: presion no está en el modelo DispositivoIoT actual
+
+        List<String> sensoresList = Arrays.asList(
+            "temperatura:" + sensores.getTemperatura(),
+            "humedad:" + sensores.getHumedad(),
+            "presion:" + sensores.getPresion()
+        );
+        dispositivo.setSensores(sensoresList);
 
         dispositivoRepositorio.save(dispositivo);
     }
@@ -189,8 +195,7 @@ public class ServicioHardwareAPI {
 
         ComandoDTO comando = new ComandoDTO();
         comando.setTipo("reproducir");
-        // Parametros como JSON string
-        comando.setParametros("{\"contenidoId\":\"" + contenidoId + "\"}");
+        comando.setParametros(Map.of("contenidoId", contenidoId));
 
         return ejecutarComando(dispositivoId, comando);
     }
@@ -279,11 +284,17 @@ public class ServicioHardwareAPI {
     /**
      * Asignar contenido a dispositivos
      */
-    public ContenidoDTO asignarContenidoADispositivos(
-            String contenidoId,
-            List<String> dispositivoIds,
-            Map<String, Object> programacion) {
+            public ContenidoDTO asignarContenidoADispositivos(
+                String contenidoId,
+                Object dispositivoIdsObj,
+                Object programacionObj) {
 
+        List<String> dispositivoIds = new ArrayList<>();
+        if (dispositivoIdsObj instanceof List) {
+            @SuppressWarnings("unchecked")
+            List<String> tmp = (List<String>) dispositivoIdsObj;
+            dispositivoIds.addAll(tmp);
+        }
         log.info("Asignando contenido {} a {} dispositivos", contenidoId, dispositivoIds.size());
 
         ContenidoRemoto contenido = contenidoRepositorio.findById(contenidoId)
@@ -291,12 +302,20 @@ public class ServicioHardwareAPI {
 
         // Convertir List<String> a List<Long> para setDispositivos
         List<Long> dispositivoIdsLong = dispositivoIds.stream()
-                .map(Long::parseLong)
-                .collect(Collectors.toList());
+            .map(id -> {
+                try { return Long.parseLong(id); } catch (Exception e) { return null; }
+            })
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
         
         contenido.setDispositivos(dispositivoIdsLong);
-        if (programacion != null && !programacion.isEmpty()) {
-            contenido.setProgramacion(programacion);
+        // Aceptar tanto Map como null; algunos clientes pueden enviar estructuras distintas
+        if (programacionObj instanceof Map) {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> programacion = (Map<String, Object>) programacionObj;
+            if (!programacion.isEmpty()) {
+                contenido.setProgramacion(programacion);
+            }
         }
         contenido.setEstado("en_ejecucion");
 

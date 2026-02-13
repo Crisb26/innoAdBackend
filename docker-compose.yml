@@ -9,14 +9,15 @@ services:
     container_name: innoad-backend
     environment:
       - SERVER_PORT=8080
-      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-server}
       - JWT_SECRET=${JWT_SECRET:-MiClaveSecretaSuperSeguraParaInnoAdQueDebeSerMuyLarga2024!}
-      - SPRING_DATASOURCE_URL=${DB_URL:-jdbc:h2:mem:innoad_db}
-      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME:-sa}
-      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD:-}
-      - SPRING_MAIL_USERNAME=${MAIL_USERNAME:-tu-email@gmail.com}
-      - SPRING_MAIL_PASSWORD=${MAIL_PASSWORD:-tu-password}
-      - INNOAD_FRONTEND_URL=${FRONTEND_URL:-http://localhost:8080}
+      - SPRING_DATASOURCE_URL=${DB_URL:-jdbc:postgresql://postgres:5432/innoad_db}
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME:-innoad}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD:-innoad_password_segura_2024}
+      - SPRING_MAIN_ALLOW_BEAN_DEFINITION_OVERRIDING=true
+      - SPRING_MAIL_USERNAME=${MAIL_USERNAME:-noreply@innoad.com}
+      - SPRING_MAIL_PASSWORD=${MAIL_PASSWORD:-password123}
+      - INNOAD_FRONTEND_URL=${FRONTEND_URL:-http://localhost:80}
     ports:
       - "8080:8080"
     restart: unless-stopped

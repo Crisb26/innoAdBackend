@@ -17,6 +17,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class InnoAdApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(InnoAdApplication.class, args);
+        SpringApplication app = new SpringApplication(InnoAdApplication.class);
+        app.setAllowBeanDefinitionOverriding(true);
+        app.run(args);
     }
 }
