@@ -136,12 +136,6 @@
             <scope>test</scope>
         </dependency>
         
-        <!-- Para Redis (caché distribuido si lo necesitas) -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-        </dependency>
-        
         <!-- Para procesamiento de archivos -->
         <dependency>
             <groupId>org.apache.poi</groupId>

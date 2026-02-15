@@ -135,15 +135,15 @@ public class ConfiguracionSeguridad {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
-        // Orígenes permitidos (desarrollo y producción)
+        // Origenes permitidos (desarrollo y produccion)
         configuration.setAllowedOriginPatterns(Arrays.asList(
                 "http://localhost:*",           // Desarrollo local (cualquier puerto)
                 "http://127.0.0.1:*",          // Desarrollo local IP
-                "https://innoad.com",           // Dominio producción
-                "https://www.innoad.com",       // Dominio producción con www
-                "https://*.vercel.app",         // Vercel deployment
-                "https://*.netlify.app",        // Netlify deployment
-                "https://*.railway.app"         // Railway frontend (opcional)
+                "http://100.91.23.46:*",       // Servidor casa (Tailscale)
+                "https://innoad.com",           // Dominio produccion
+                "https://www.innoad.com",       // Dominio produccion con www
+                "https://*.netlify.app",        // Netlify deployment (frontend)
+                "https://*.azurecontainerapps.io" // Azure Container Apps (emergencia)
         ));
         
         // Métodos HTTP permitidos
