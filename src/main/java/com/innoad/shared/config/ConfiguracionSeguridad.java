@@ -139,7 +139,8 @@ public class ConfiguracionSeguridad {
         configuration.setAllowedOriginPatterns(Arrays.asList(
                 "http://localhost:*",           // Desarrollo local (cualquier puerto)
                 "http://127.0.0.1:*",          // Desarrollo local IP
-                "http://100.91.23.46:*",       // Servidor casa (Tailscale)
+                "http://100.91.23.46:*",       // Servidor casa (red local)
+                "https://*.ts.net",            // Tailscale Funnel (servidor casa HTTPS)
                 "https://innoad.com",           // Dominio produccion
                 "https://www.innoad.com",       // Dominio produccion con www
                 "https://*.netlify.app",        // Netlify deployment (frontend)

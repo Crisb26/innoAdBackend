@@ -66,4 +66,5 @@ innoad:
       - http://localhost:4200
       - http://100.91.23.46
       - http://100.91.23.46:8080
+      - https://*.ts.net
       - https://*.netlify.app
