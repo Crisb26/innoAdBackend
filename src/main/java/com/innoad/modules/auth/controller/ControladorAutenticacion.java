@@ -80,12 +80,10 @@ public class ControladorAutenticacion {
             
             // Convertir enum RolUsuario a String
             String rolNombre = switch (respuestaAuth.getRol()) {
-                case ADMINISTRADOR -> "Administrador";
-                case TECNICO -> "Técnico";
-                case DESARROLLADOR -> "Desarrollador";
-                case USUARIO -> "Usuario";
-                case VISITANTE -> "Visitante";
-                default -> "Usuario"; // Caso por defecto
+                case ADMIN -> "ADMIN";
+                case TECNICO -> "TECNICO";
+                case USUARIO -> "USUARIO";
+                default -> "USUARIO";
             };
             
             // Construir rol simple
