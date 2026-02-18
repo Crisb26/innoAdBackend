@@ -1,6 +1,6 @@
 package com.innoad.modules.publicaciones.servicio;
 
-import com.innoad.modules.publicaciones.model.Publicacion;
+import com.innoad.modules.publicaciones.domain.Publicacion;
 import com.innoad.modules.publicaciones.repository.PublicacionRepository;
 import com.innoad.modules.publicaciones.dto.PublicacionDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +26,11 @@ public class PublicacionServicio {
         Publicacion publicacion = new Publicacion();
         publicacion.setTitulo(dto.getTitulo());
         publicacion.setDescripcion(dto.getDescripcion());
-        publicacion.setTipoContenido(Publicacion.TipoContenido.valueOf(dto.getTipoContenido()));
-        publicacion.setArchivoUrl(dto.getArchivoUrl());
-        publicacion.setDuracionDias(dto.getDuracionDias());
-        publicacion.setUsuarioId(dto.getUsuarioId());
-        publicacion.setCostoTotal(dto.getCostoTotal());
-        publicacion.setUbicacionesJson(dto.getUbicacionesJson());
-        publicacion.setEstado(Publicacion.EstadoPublicacion.PENDIENTE);
+        publicacion.setTipoFormato(Publicacion.TipoFormato.valueOf(dto.getTipoContenido()));
+        publicacion.setImagenUrl(dto.getArchivoUrl());
+        publicacion.setUbicacion(dto.getUbicacionesJson());
+        publicacion.setPrecioCOP(dto.getCostoTotal().doubleValue());
+        publicacion.setEstado(Publicacion.EstadoPublicacion.PENDIENTE_REVISION);
         publicacion.setFechaCreacion(LocalDateTime.now());
         
         Publicacion saved = publicacionRepository.save(publicacion);
