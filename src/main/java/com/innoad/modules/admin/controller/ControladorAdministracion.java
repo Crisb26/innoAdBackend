@@ -452,7 +452,11 @@ public class ControladorAdministracion {
                     administrador,
                     solicitud.getCodigoSeguridad(),
                     solicitud.getMensaje(),
-                    solicitud.getFechaFinEstimada()
+                    solicitud.getFechaFinEstimada(),
+                    solicitud.getTipoMantenimiento(),
+                    solicitud.getRolesAfectados(),
+                    solicitud.getRolesExcluidos(),
+                    solicitud.getUrlContactoSoporte()
             );
 
             servicioAdministracion.registrarAuditoria(
@@ -460,7 +464,11 @@ public class ControladorAdministracion {
                     "Sistema",
                     null,
                     administrador,
-                    "Modo mantenimiento activado. Mensaje: " + solicitud.getMensaje(),
+                    String.format(
+                        "Mantenimiento activado. Tipo: %s. Roles afectados: %s",
+                        solicitud.getTipoMantenimiento(),
+                        solicitud.getRolesAfectados()
+                    ),
                     request.getRemoteAddr(),
                     "EXITOSO"
             );
