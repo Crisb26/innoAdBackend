@@ -26,11 +26,7 @@ import java.util.Map;
 @RestController("controladorAutenticacionAuth")
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-<<<<<<< HEAD:src/main/java/com/innoad/modules/auth/controller/ControladorAutenticacion.java
-@CrossOrigin(origins = {"http://localhost", "http://localhost:80", "http://localhost:4200", "http://localhost:8080", "http://127.0.0.1", "http://127.0.0.1:80"})
-=======
-@CrossOrigin(origins = {"http://localhost:4200", "http://localhost:8080", "http://127.0.0.1:8080", "https://friendly-lollipop-ce7d8c.netlify.app"})
->>>>>>> 7fec8ee81ef8b666c0040a543fba55f4d5021f24:src/main/java/com/innoad/modules/auth-disable/controller/ControladorAutenticacion.java
+@CrossOrigin(origins = {"http://localhost", "http://localhost:80", "http://localhost:4200", "http://localhost:8080", "http://127.0.0.1", "http://127.0.0.1:80", "http://127.0.0.1:8080", "https://friendly-lollipop-ce7d8c.netlify.app"})
 public class ControladorAutenticacion {
     
     private final ServicioAutenticacion servicioAutenticacion;
