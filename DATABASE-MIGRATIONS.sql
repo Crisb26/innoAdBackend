@@ -229,4 +229,21 @@ CREATE INDEX IF NOT EXISTS idx_usuarios_rol ON usuarios(rol);
 -- \d mensajes_chat
 -- =====================================================================
 
-COMMIT;
+-- 20. TABLA DE CÓDIGOS DE VERIFICACIÓN (para registro y recuperación de contraseña)
+CREATE TABLE IF NOT EXISTS codigos_verificacion (
+    id BIGSERIAL PRIMARY KEY,
+    email VARCHAR(100) NOT NULL,
+    codigo VARCHAR(6) NOT NULL,
+    tipo VARCHAR(20) NOT NULL, -- REGISTRO o RECUPERACION
+    creado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    expira_en TIMESTAMP NOT NULL,
+    usado BOOLEAN DEFAULT FALSE,
+    intentos_fallidos INTEGER DEFAULT 0,
+    CONSTRAINT chk_codigo_length CHECK (LENGTH(codigo) = 6),
+    CONSTRAINT chk_tipo_valido CHECK (tipo IN ('REGISTRO', 'RECUPERACION'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_email_tipo ON codigos_verificacion(email, tipo);
+CREATE INDEX IF NOT EXISTS idx_codigo_tipo ON codigos_verificacion(codigo, tipo);
+CREATE INDEX IF NOT EXISTS idx_expira_en ON codigos_verificacion(expira_en);
+

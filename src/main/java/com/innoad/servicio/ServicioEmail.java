@@ -66,7 +66,7 @@ public class ServicioEmail {
     /**
      * Envía un email HTML
      */
-    private void enviarEmailHTML(String para, String asunto, String contenido) {
+    public void enviarEmailHTML(String para, String asunto, String contenido) {
         try {
             MimeMessage mensaje = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mensaje, true, "UTF-8");

@@ -10,7 +10,12 @@ import com.innoad.dto.respuesta.RespuestaAutenticacion;
 import com.innoad.dto.respuesta.RespuestaAPI;
 import com.innoad.dto.respuesta.RespuestaLogin;
 import com.innoad.dto.solicitud.SolicitudRefreshToken;
+import com.innoad.dto.solicitud.SolicitudSolicitarCodigoVerificacion;
+import com.innoad.dto.solicitud.SolicitudVerificarCodigoRegistro;
+import com.innoad.dto.solicitud.SolicitudVerificarCodigoRecuperacion;
+import com.innoad.modules.auth.domain.CodigoVerificacion;
 import com.innoad.modules.auth.service.ServicioAutenticacion;
+import com.innoad.modules.auth.service.ServicioCodigosVerificacion;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,10 +26,11 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:4200", "http://localhost:8080", "http://127.0.0.1:8080"})
+@CrossOrigin(origins = {"http://localhost", "http://localhost:80", "http://localhost:4200", "http://localhost:8080", "http://127.0.0.1", "http://127.0.0.1:80"})
 public class ControladorAutenticacion {
     
     private final ServicioAutenticacion servicioAutenticacion;
+    private final ServicioCodigosVerificacion servicioCodigosVerificacion;
     
     /**
      * Registro público de usuarios - Solo crea usuarios con rol "USUARIO"
@@ -253,6 +259,138 @@ public class ControladorAutenticacion {
                     .body(RespuestaAPI.<RespuestaLogin.UsuarioLogin>builder()
                             .exitoso(false)
                             .mensaje("Error al actualizar perfil: " + e.getMessage())
+                            .build());
+        }
+    }
+
+    // ==================== ENDPOINTS DE CÓDIGOS DE VERIFICACIÓN ====================
+
+    /**
+     * Solicitar un código de verificación por email
+     * Se usa para iniciar el flujo de registro o recuperación de contraseña
+     */
+    @PostMapping("/solicitar-codigo")
+    public ResponseEntity<RespuestaAPI<Void>> solicitarCodigoVerificacion(
+            @Valid @RequestBody SolicitudSolicitarCodigoVerificacion solicitud
+    ) {
+        try {
+            servicioCodigosVerificacion.generarCodigoVerificacion(
+                    solicitud.getEmail(),
+                    CodigoVerificacion.TipoVerificacion.valueOf(solicitud.getTipo().toUpperCase())
+            );
+            return ResponseEntity.ok(
+                    RespuestaAPI.<Void>builder()
+                            .exitoso(true)
+                            .mensaje("Código de verificación enviado a tu email. Expira en 15 minutos.")
+                            .build()
+            );
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(RespuestaAPI.<Void>builder()
+                            .exitoso(false)
+                            .mensaje("Error al solicitar código: " + e.getMessage())
+                            .build());
+        }
+    }
+
+    /**
+     * Verificar código y completar registro con código de verificación
+     */
+    @PostMapping("/registrar-con-codigo")
+    public ResponseEntity<RespuestaAPI<RespuestaAutenticacion>> registrarConCodigo(
+            @Valid @RequestBody SolicitudVerificarCodigoRegistro solicitud
+    ) {
+        try {
+            // Validar el código
+            boolean codigoValido = servicioCodigosVerificacion.validarCodigoVerificacion(
+                    solicitud.getEmail(),
+                    solicitud.getCodigo(),
+                    CodigoVerificacion.TipoVerificacion.REGISTRO
+            );
+
+            if (!codigoValido) {
+                servicioCodigosVerificacion.incrementarIntentosFallidos(
+                        solicitud.getEmail(),
+                        solicitud.getCodigo(),
+                        CodigoVerificacion.TipoVerificacion.REGISTRO
+                );
+                return ResponseEntity.badRequest()
+                        .body(RespuestaAPI.<RespuestaAutenticacion>builder()
+                                .exitoso(false)
+                                .mensaje("Código de verificación inválido o expirado")
+                                .build());
+            }
+
+            // Convertir a SolicitudRegistroPublico y registrar
+            SolicitudRegistroPublico solicitudRegistro = SolicitudRegistroPublico.builder()
+                    .email(solicitud.getEmail())
+                    .nombre(solicitud.getNombre())
+                    .apellido(solicitud.getApellido())
+                    .nombreUsuario(solicitud.getNombreUsuario())
+                    .cedula(solicitud.getCedula())
+                    .contrasena(solicitud.getContrasena())
+                    .build();
+
+            RespuestaAutenticacion respuesta = servicioAutenticacion.registrarPublico(solicitudRegistro);
+
+            return ResponseEntity.ok(
+                    RespuestaAPI.<RespuestaAutenticacion>builder()
+                            .exitoso(true)
+                            .mensaje("Usuario registrado exitosamente")
+                            .datos(respuesta)
+                            .build()
+            );
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(RespuestaAPI.<RespuestaAutenticacion>builder()
+                            .exitoso(false)
+                            .mensaje("Error al registrar: " + e.getMessage())
+                            .build());
+        }
+    }
+
+    /**
+     * Verificar código y recuperar contraseña
+     */
+    @PostMapping("/recuperar-contrasena-con-codigo")
+    public ResponseEntity<RespuestaAPI<Void>> recuperarContrasenaCodigo(
+            @Valid @RequestBody SolicitudVerificarCodigoRecuperacion solicitud
+    ) {
+        try {
+            // Validar el código
+            boolean codigoValido = servicioCodigosVerificacion.validarCodigoVerificacion(
+                    solicitud.getEmail(),
+                    solicitud.getCodigo(),
+                    CodigoVerificacion.TipoVerificacion.RECUPERACION
+            );
+
+            if (!codigoValido) {
+                servicioCodigosVerificacion.incrementarIntentosFallidos(
+                        solicitud.getEmail(),
+                        solicitud.getCodigo(),
+                        CodigoVerificacion.TipoVerificacion.RECUPERACION
+                );
+                return ResponseEntity.badRequest()
+                        .body(RespuestaAPI.<Void>builder()
+                                .exitoso(false)
+                                .mensaje("Código de verificación inválido o expirado")
+                                .build());
+            }
+
+            // Cambiar la contraseña
+            servicioAutenticacion.restablecerContraseñaConEmail(solicitud.getEmail(), solicitud.getContrasenaNueva());
+
+            return ResponseEntity.ok(
+                    RespuestaAPI.<Void>builder()
+                            .exitoso(true)
+                            .mensaje("Contraseña restablecida exitosamente. Ya puedes iniciar sesión con tu nueva contraseña.")
+                            .build()
+            );
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(RespuestaAPI.<Void>builder()
+                            .exitoso(false)
+                            .mensaje("Error al recuperar contraseña: " + e.getMessage())
                             .build());
         }
     }

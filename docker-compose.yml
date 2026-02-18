@@ -16,7 +16,8 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init-database.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./DATABASE-SCRIPT.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./DATABASE-MIGRATIONS.sql:/docker-entrypoint-initdb.d/02-migrations.sql:ro
     ports:
       - "${DB_EXTERNAL_PORT:-5433}:5432"
     restart: unless-stopped

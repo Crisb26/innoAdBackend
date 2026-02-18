@@ -293,6 +293,23 @@ public class ServicioAutenticacion {
     }
 
     /**
+     * Restablece la contraseña usando email y código de verificación
+     * Se usa cuando el código de verificación ya ha sido validado
+     */
+    @Transactional
+    public void restablecerContraseñaConEmail(String email, String nuevaContrasena) {
+        Usuario usuario = repositorioUsuario.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        
+        usuario.setContrasena(passwordEncoder.encode(nuevaContrasena));
+        usuario.setTokenRecuperacion(null);
+        usuario.setTokenRecuperacionExpiracion(null);
+        repositorioUsuario.save(usuario);
+        
+        log.info("Contraseña restablecida para usuario: {}", email);
+    }
+
+    /**
      * Autentica un usuario y devuelve el contrato esperado por el frontend
      */
     @Transactional

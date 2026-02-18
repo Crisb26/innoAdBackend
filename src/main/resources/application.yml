@@ -35,8 +35,8 @@ spring:
   mail:
     host: ${MAIL_HOST:smtp.gmail.com}
     port: ${MAIL_PORT:587}
-    username: ${MAIL_USERNAME:}
-    password: ${MAIL_PASSWORD:}
+    username: ${SPRING_MAIL_USERNAME:${MAIL_USERNAME:innoad2026@gmail.com}}
+    password: ${SPRING_MAIL_PASSWORD:${MAIL_PASSWORD:jfvmtsrqciyagvqz}}
     properties:
       mail:
         smtp:
@@ -48,7 +48,11 @@ spring:
           timeout: 5000
           writetimeout: 5000
 
-  # Configuracion de cache (en memoria, sin Redis)
+  # Configuracion de Brevo (email profesional)
+  brevo:
+    api-key: ${BREVO_API_KEY:}
+    from-email: ${BREVO_FROM_EMAIL:noreply@innoad.com}
+    from-name: InnoAd  # Configuracion de cache (en memoria, sin Redis)
   cache:
     type: simple
 
@@ -68,7 +72,7 @@ spring:
 
 # Configuracion de JWT
 jwt:
-  secret: ${JWT_SECRET:MiClaveSecretaSuperSeguraParaInnoAdQueDebeSerMuyLarga2024!}
+  secret: ${JWT_SECRET:lFmlbQNFB8o7XC4/GvwKPTHY9fGB32LeTW/mWyTMmFl1bQ1ZvmYDjZz9rXB6KmUwoXRCXaU6RqFqKlFuUngZKw==}
   expiration: 86400000
   refresh-expiration: 604800000
 
@@ -131,6 +135,7 @@ logging:
     com.innoad.modules.auth: DEBUG
     org.springframework.web: INFO
     org.springframework.security: INFO
+    org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer: ERROR
     org.hibernate.SQL: WARN
   pattern:
     console: '%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n'
