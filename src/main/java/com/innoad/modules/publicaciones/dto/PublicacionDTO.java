@@ -1,6 +1,5 @@
 package com.innoad.modules.publicaciones.dto;
 
-import com.innoad.modules.publicaciones.model.Publicacion;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
