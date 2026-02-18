@@ -28,7 +28,7 @@ import java.util.UUID;
  * Servicio de autenticación para registro, login y recuperación de contraseña.
  */
 @Slf4j
-@Service("servicioAutenticacionAuth")
+@Service
 @RequiredArgsConstructor
 public class ServicioAutenticacion {
     
@@ -71,7 +71,7 @@ public class ServicioAutenticacion {
                 .email(solicitud.getEmail())
                 .nombreUsuario(solicitud.getNombreUsuario())
                 .contrasena(passwordEncoder.encode(solicitud.getContrasena()))
-                .rol(solicitud.getRol() != null ? solicitud.getRol() : RolUsuario.USER)
+                .rol(solicitud.getRol() != null ? solicitud.getRol() : RolUsuario.USUARIO)
                 .telefono(solicitud.getTelefono())
                 .empresa(solicitud.getEmpresa())
                 .cargo(solicitud.getCargo())
@@ -132,14 +132,14 @@ public class ServicioAutenticacion {
             throw new RuntimeException("El email ya está registrado");
         }
 
-        // Crear el usuario con rol USER forzado
+        // Crear el usuario con rol USUARIO forzado
         var usuario = Usuario.builder()
                 .nombre(solicitud.getNombre())
                 .apellido(solicitud.getApellido())
                 .email(solicitud.getEmail())
                 .nombreUsuario(solicitud.getNombreUsuario())
                 .contrasena(passwordEncoder.encode(solicitud.getContrasena()))
-                .rol(RolUsuario.USER) // Siempre USER en registro público
+                .rol(RolUsuario.USUARIO) // Siempre USUARIO en registro público
                 .cedula(solicitud.getCedula())
                 .telefono(solicitud.getTelefono())
                 .empresa(solicitud.getEmpresa())
@@ -185,11 +185,11 @@ public class ServicioAutenticacion {
      */
     @Transactional
     public RespuestaAutenticacion autenticar(SolicitudLogin solicitud) {
-        // Buscar usuario por nombre de usuario o email
-        Usuario usuario = repositorioUsuario.findByNombreUsuario(solicitud.getNombreUsuarioOEmail())
+        // Buscar usuario por nombre de usuario (case-insensitive) o email
+        Usuario usuario = repositorioUsuario.findByNombreUsuarioCaseInsensitive(solicitud.getNombreUsuarioOEmail())
                 .or(() -> repositorioUsuario.findByEmail(solicitud.getNombreUsuarioOEmail()))
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        
+
         // Verificar si la cuenta está bloqueada
         if (!usuario.isAccountNonLocked()) {
             throw new RuntimeException("Cuenta bloqueada por múltiples intentos fallidos. Intenta más tarde.");
@@ -297,8 +297,8 @@ public class ServicioAutenticacion {
      */
     @Transactional
     public RespuestaAPI<RespuestaLogin> autenticarV1(SolicitudLogin solicitud) {
-        // Reutilizar lógica existente
-        Usuario usuario = repositorioUsuario.findByNombreUsuario(solicitud.getNombreUsuarioOEmail())
+        // Buscar usuario por nombre (case-insensitive) o email
+        Usuario usuario = repositorioUsuario.findByNombreUsuarioCaseInsensitive(solicitud.getNombreUsuarioOEmail())
                 .or(() -> repositorioUsuario.findByEmail(solicitud.getNombreUsuarioOEmail()))
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
@@ -330,11 +330,10 @@ public class ServicioAutenticacion {
         var refreshToken = servicioJWT.generarTokenRefresh(usuario);
 
         var rolNombre = switch (usuario.getRol()) {
-            case ADMINISTRADOR -> "Administrador";
-            case TECNICO -> "Técnico";
-            case DESARROLLADOR -> "Desarrollador";
-            case USUARIO, USER -> "Usuario";
-            case VISITANTE -> "Visitante";
+            case ADMIN -> "ADMIN";
+            case TECNICO -> "TECNICO";
+            case USUARIO -> "USUARIO";
+            default -> "USUARIO";
         };
 
         var usuarioLogin = RespuestaLogin.UsuarioLogin.builder()
@@ -380,11 +379,10 @@ public class ServicioAutenticacion {
         var nuevoAccessToken = servicioJWT.generarToken(usuario);
 
         var rolNombre = switch (usuario.getRol()) {
-            case ADMINISTRADOR -> "Administrador";
-            case TECNICO -> "Técnico";
-            case DESARROLLADOR -> "Desarrollador";
-            case USUARIO, USER -> "Usuario";
-            case VISITANTE -> "Visitante";
+            case ADMIN -> "ADMIN";
+            case TECNICO -> "TECNICO";
+            case USUARIO -> "USUARIO";
+            default -> "USUARIO";
         };
 
         var usuarioLogin = RespuestaLogin.UsuarioLogin.builder()
@@ -449,16 +447,15 @@ public class ServicioAutenticacion {
         
         // Guardar cambios
         usuario = repositorioUsuario.save(usuario);
-        
+
         // Construir respuesta
         var rolNombre = switch (usuario.getRol()) {
-            case ADMINISTRADOR -> "Administrador";
-            case TECNICO -> "Técnico";
-            case DESARROLLADOR -> "Desarrollador";
-            case USUARIO, USER -> "Usuario";
-            case VISITANTE -> "Visitante";
+            case ADMIN -> "ADMIN";
+            case TECNICO -> "TECNICO";
+            case USUARIO -> "USUARIO";
+            default -> "USUARIO";
         };
-        
+
         return RespuestaLogin.UsuarioLogin.builder()
                 .id(usuario.getId())
                 .nombreUsuario(usuario.getNombreUsuario())

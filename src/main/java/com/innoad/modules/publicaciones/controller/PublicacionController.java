@@ -1,179 +1,251 @@
 package com.innoad.modules.publicaciones.controller;
 
-import com.innoad.modules.publicaciones.servicio.PublicacionServicio;
-import com.innoad.modules.publicaciones.dto.PublicacionDTO;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import com.innoad.modules.publicaciones.domain.Publicacion;
+import com.innoad.modules.publicaciones.service.PublicacionService;
+import com.innoad.modules.auth.domain.Usuario;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Controlador para Publicaciones
+ * Maneja upload de imágenes, creación y gestión de publicaciones
+ */
 @RestController
-@RequestMapping("/api/publicaciones")
-@CrossOrigin(origins = {"http://localhost:4200", "http://localhost:3000"})
+@RequestMapping("/api/v1/publicaciones")
+@RequiredArgsConstructor
 @Slf4j
 public class PublicacionController {
-    
-    @Autowired
-    private PublicacionServicio publicacionServicio;
-    
+
+    private final PublicacionService publicacionService;
+
     /**
-     * POST /api/publicaciones - Crear nueva publicación
+     * Crear publicación con imagen
      */
-    @PostMapping
-    public ResponseEntity<?> crearPublicacion(@RequestBody PublicacionDTO dto) {
+    @PostMapping("/crear")
+    public ResponseEntity<Map<String, Object>> crearPublicacion(
+            @AuthenticationPrincipal Usuario usuario,
+            @RequestParam String titulo,
+            @RequestParam String descripcion,
+            @RequestParam String ubicacion,
+            @RequestParam Double precioCOP,
+            @RequestParam(defaultValue = "HORIZONTAL") String formato,
+            @RequestParam MultipartFile imagen) {
+
         try {
-            log.info("POST: Creando publicación - {}", dto.getTitulo());
-            PublicacionDTO created = publicacionServicio.crearPublicacion(dto);
-            return ResponseEntity.ok(created);
+            Publicacion pub = publicacionService.crearPublicacion(usuario, titulo, descripcion,
+                    ubicacion, precioCOP, formato, imagen);
+
+            return ResponseEntity.ok(Map.of(
+                    "exito", true,
+                    "mensaje", "Publicación creada exitosamente",
+                    "publicacionId", pub.getId(),
+                    "estado", pub.getEstado().toString(),
+                    "imagenUrl", pub.getImagenUrl()
+            ));
+        } catch (IOException e) {
+            log.error("Error al guardar imagen", e);
+            return ResponseEntity.badRequest()
+                    .body(Map.of("exito", false, "error", "Error al guardar imagen: " + e.getMessage()));
         } catch (Exception e) {
             log.error("Error al crear publicación", e);
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+            return ResponseEntity.badRequest()
+                    .body(Map.of("exito", false, "error", e.getMessage()));
         }
     }
-    
+
     /**
-     * POST /api/publicaciones/borrador - Guardar publicación como borrador
+     * Obtener publicaciones del usuario actual
      */
-    @PostMapping("/borrador")
-    public ResponseEntity<?> guardarBorrador(@RequestBody PublicacionDTO dto) {
+    @GetMapping("/mis-publicaciones")
+    public ResponseEntity<Map<String, Object>> obtenerMisPublicaciones(
+            @AuthenticationPrincipal Usuario usuario,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
         try {
-            log.info("POST: Guardando publicación como borrador - {}", dto.getTitulo());
-            dto.setEstado("BORRADOR");
-            PublicacionDTO created = publicacionServicio.crearPublicacion(dto);
+            Pageable pageable = PageRequest.of(page, size);
+            Page<Publicacion> publicaciones = publicacionService.obtenerPublicacionesUsuario(usuario, pageable);
+
             return ResponseEntity.ok(Map.of(
-                "mensaje", "Publicación guardada como borrador exitosamente",
-                "publicacionId", created.getId(),
-                "estado", "BORRADOR"
+                    "exito", true,
+                    "publicaciones", publicaciones.getContent(),
+                    "totalPages", publicaciones.getTotalPages(),
+                    "totalElements", publicaciones.getTotalElements(),
+                    "currentPage", page
             ));
         } catch (Exception e) {
-            log.error("Error al guardar borrador", e);
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+            log.error("Error al obtener publicaciones", e);
+            return ResponseEntity.badRequest()
+                    .body(Map.of("exito", false, "error", e.getMessage()));
         }
     }
-    
+
     /**
-     * POST /api/publicaciones/mis - Obtener mis publicaciones (del usuario autenticado)
+     * Obtener publicaciones pendientes de revisión (TECNICO/ADMIN)
      */
-    @GetMapping("/mis")
-    public ResponseEntity<?> obtenerMisPublicaciones() {
+    @GetMapping("/pendientes-revision")
+    public ResponseEntity<Map<String, Object>> obtenerPendientes(
+            @AuthenticationPrincipal Usuario usuario) {
+
+        // Validar que sea TECNICO o ADMIN
+        if (!esAutorizado(usuario)) {
+            return ResponseEntity.status(403)
+                    .body(Map.of("exito", false, "error", "No autorizado"));
+        }
+
         try {
-            log.info("GET: Obteniendo mis publicaciones");
-            // Nota: En producción, obtener usuarioId del JWT token
-            // Por ahora, se puede pasar como parámetro o desde contexto de seguridad
-            List<PublicacionDTO> mis = publicacionServicio.obtenerPublicacionesPublicadas();
-            return ResponseEntity.ok(mis);
+            List<Publicacion> pendientes = publicacionService.obtenerPendientesRevision();
+
+            return ResponseEntity.ok(Map.of(
+                    "exito", true,
+                    "cantidad", pendientes.size(),
+                    "publicaciones", pendientes
+            ));
         } catch (Exception e) {
-            log.error("Error al obtener mis publicaciones", e);
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+            log.error("Error al obtener pendientes", e);
+            return ResponseEntity.badRequest()
+                    .body(Map.of("exito", false, "error", e.getMessage()));
         }
     }
-    
+
     /**
-     * GET /api/publicaciones/usuario/{usuarioId} - Obtener publicaciones del usuario
+     * Aprobar publicación (TECNICO/ADMIN)
      */
-    @GetMapping("/usuario/{usuarioId}")
-    public ResponseEntity<?> obtenerPublicacionesUsuario(@PathVariable Long usuarioId) {
-        try {
-            log.info("GET: Obteniendo publicaciones del usuario - {}", usuarioId);
-            List<PublicacionDTO> publicaciones = publicacionServicio.obtenerPublicacionesUsuario(usuarioId);
-            return ResponseEntity.ok(publicaciones);
-        } catch (Exception e) {
-            log.error("Error al obtener publicaciones del usuario", e);
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    @PostMapping("/{id}/aprobar")
+    public ResponseEntity<Map<String, Object>> aprobarPublicacion(
+            @AuthenticationPrincipal Usuario usuario,
+            @PathVariable Long id) {
+
+        if (!esAutorizado(usuario)) {
+            return ResponseEntity.status(403)
+                    .body(Map.of("exito", false, "error", "No autorizado"));
         }
-    }
-    
-    /**
-     * GET /api/publicaciones/{id} - Obtener publicación por ID
-     */
-    @GetMapping("/{id}")
-    public ResponseEntity<?> obtenerPublicacionPorId(@PathVariable Long id) {
+
         try {
-            log.info("GET: Obteniendo publicación - {}", id);
-            PublicacionDTO publicacion = publicacionServicio.obtenerPublicacionPorId(id);
-            return ResponseEntity.ok(publicacion);
-        } catch (Exception e) {
-            log.error("Error al obtener publicación", e);
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
-    }
-    
-    /**
-     * GET /api/publicaciones/pendientes - Obtener publicaciones pendientes (TECNICO)
-     */
-    @GetMapping("/pendientes/lista")
-    public ResponseEntity<?> obtenerPublicacionesPendientes() {
-        try {
-            log.info("GET: Obteniendo publicaciones pendientes");
-            List<PublicacionDTO> pendientes = publicacionServicio.obtenerPublicacionesPendientes();
-            return ResponseEntity.ok(pendientes);
-        } catch (Exception e) {
-            log.error("Error al obtener publicaciones pendientes", e);
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
-    }
-    
-    /**
-     * PUT /api/publicaciones/{id}/aprobar - Aprobar publicación
-     */
-    @PutMapping("/{id}/aprobar")
-    public ResponseEntity<?> aprobarPublicacion(@PathVariable Long id) {
-        try {
-            log.info("PUT: Aprobando publicación - {}", id);
-            PublicacionDTO aprobada = publicacionServicio.aprobarPublicacion(id);
-            return ResponseEntity.ok(aprobada);
+            Publicacion pub = publicacionService.aprobarPublicacion(id);
+            return ResponseEntity.ok(Map.of(
+                    "exito", true,
+                    "mensaje", "Publicación aprobada",
+                    "publicacion", pub
+            ));
         } catch (Exception e) {
             log.error("Error al aprobar publicación", e);
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+            return ResponseEntity.badRequest()
+                    .body(Map.of("exito", false, "error", e.getMessage()));
         }
     }
-    
+
     /**
-     * PUT /api/publicaciones/{id}/rechazar - Rechazar publicación
+     * Rechazar publicación (TECNICO/ADMIN)
      */
-    @PutMapping("/{id}/rechazar")
-    public ResponseEntity<?> rechazarPublicacion(@PathVariable Long id, @RequestBody Map<String, String> body) {
+    @PostMapping("/{id}/rechazar")
+    public ResponseEntity<Map<String, Object>> rechazarPublicacion(
+            @AuthenticationPrincipal Usuario usuario,
+            @PathVariable Long id) {
+
+        if (!esAutorizado(usuario)) {
+            return ResponseEntity.status(403)
+                    .body(Map.of("exito", false, "error", "No autorizado"));
+        }
+
         try {
-            log.info("PUT: Rechazando publicación - {}", id);
-            String motivo = body.getOrDefault("motivo", "");
-            PublicacionDTO rechazada = publicacionServicio.rechazarPublicacion(id, motivo);
-            return ResponseEntity.ok(rechazada);
+            Publicacion pub = publicacionService.rechazarPublicacion(id);
+            return ResponseEntity.ok(Map.of(
+                    "exito", true,
+                    "mensaje", "Publicación rechazada",
+                    "publicacion", pub
+            ));
         } catch (Exception e) {
             log.error("Error al rechazar publicación", e);
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+            return ResponseEntity.badRequest()
+                    .body(Map.of("exito", false, "error", e.getMessage()));
         }
     }
-    
+
     /**
-     * PUT /api/publicaciones/{id}/publicar - Publicar publicación aprobada
+     * Activar publicación (cambiar a ACTIVA)
      */
-    @PutMapping("/{id}/publicar")
-    public ResponseEntity<?> publicarPublicacion(@PathVariable Long id) {
+    @PostMapping("/{id}/activar")
+    public ResponseEntity<Map<String, Object>> activarPublicacion(
+            @AuthenticationPrincipal Usuario usuario,
+            @PathVariable Long id,
+            @RequestParam String fechaInicio,
+            @RequestParam String fechaFin) {
+
         try {
-            log.info("PUT: Publicando - {}", id);
-            PublicacionDTO publicada = publicacionServicio.publicarPublicacion(id);
-            return ResponseEntity.ok(publicada);
+            LocalDateTime inicio = LocalDateTime.parse(fechaInicio);
+            LocalDateTime fin = LocalDateTime.parse(fechaFin);
+
+            Publicacion pub = publicacionService.activarPublicacion(id, inicio, fin);
+            return ResponseEntity.ok(Map.of(
+                    "exito", true,
+                    "mensaje", "Publicación activada",
+                    "publicacion", pub
+            ));
         } catch (Exception e) {
-            log.error("Error al publicar", e);
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+            log.error("Error al activar publicación", e);
+            return ResponseEntity.badRequest()
+                    .body(Map.of("exito", false, "error", e.getMessage()));
         }
     }
-    
+
     /**
-     * GET /api/publicaciones/publicadas/feed - Obtener feed de publicaciones
+     * Pausar publicación
      */
-    @GetMapping("/publicadas/feed")
-    public ResponseEntity<?> obtenerFeed() {
+    @PostMapping("/{id}/pausar")
+    public ResponseEntity<Map<String, Object>> pausarPublicacion(
+            @AuthenticationPrincipal Usuario usuario,
+            @PathVariable Long id) {
+
         try {
-            log.info("GET: Obteniendo feed de publicaciones");
-            List<PublicacionDTO> feed = publicacionServicio.obtenerPublicacionesPublicadas();
-            return ResponseEntity.ok(feed);
+            Publicacion pub = publicacionService.pausarPublicacion(id);
+            return ResponseEntity.ok(Map.of(
+                    "exito", true,
+                    "mensaje", "Publicación pausada",
+                    "publicacion", pub
+            ));
         } catch (Exception e) {
-            log.error("Error al obtener feed", e);
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+            log.error("Error al pausar publicación", e);
+            return ResponseEntity.badRequest()
+                    .body(Map.of("exito", false, "error", e.getMessage()));
         }
+    }
+
+    /**
+     * Eliminar publicación
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String, Object>> eliminarPublicacion(
+            @AuthenticationPrincipal Usuario usuario,
+            @PathVariable Long id) {
+
+        try {
+            publicacionService.eliminarPublicacion(id);
+            return ResponseEntity.ok(Map.of(
+                    "exito", true,
+                    "mensaje", "Publicación eliminada"
+            ));
+        } catch (Exception e) {
+            log.error("Error al eliminar publicación", e);
+            return ResponseEntity.badRequest()
+                    .body(Map.of("exito", false, "error", e.getMessage()));
+        }
+    }
+
+    private boolean esAutorizado(Usuario usuario) {
+        String rol = usuario.getRol().toString();
+        return rol.equals("ADMIN") || rol.equals("TECNICO");
     }
 }

@@ -175,16 +175,29 @@ public class Usuario implements UserDetails {
      * Verifica si el usuario es administrador
      */
     public boolean esAdministrador() {
-        return this.rol == RolUsuario.ADMINISTRADOR;
+        return this.rol == RolUsuario.ADMIN;
     }
-    
+
+    /**
+     * Verifica si el usuario es técnico
+     */
+    public boolean esTecnico() {
+        return this.rol == RolUsuario.TECNICO;
+    }
+
+    /**
+     * Verifica si el usuario es usuario regular
+     */
+    public boolean esUsuario() {
+        return this.rol == RolUsuario.USUARIO;
+    }
+
     /**
      * Verifica si el usuario tiene permisos de acceso durante mantenimiento
      */
     public boolean puedeAccederEnMantenimiento() {
-        return this.rol == RolUsuario.ADMINISTRADOR ||
-               this.rol == RolUsuario.TECNICO ||
-               this.rol == RolUsuario.DESARROLLADOR;
+        return this.rol == RolUsuario.ADMIN ||
+               this.rol == RolUsuario.TECNICO;
     }
 }
 
