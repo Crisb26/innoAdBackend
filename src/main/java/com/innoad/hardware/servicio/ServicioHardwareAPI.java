@@ -4,7 +4,7 @@ import com.innoad.hardware.dto.*;
 import com.innoad.hardware.repository.DispositivoRepositorio;
 import com.innoad.hardware.repository.ContenidoRepositorio;
 import com.innoad.hardware.model.DispositivoIoT;
-import com.innoad.modules.contenidos.model.ContenidoRemoto;
+import com.innoad.hardware.model.ContenidoRemoto;
 import com.innoad.hardware.model.EstadisticasDispositivo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

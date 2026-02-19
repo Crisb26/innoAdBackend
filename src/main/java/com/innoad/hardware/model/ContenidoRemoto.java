@@ -1,4 +1,4 @@
-package com.innoad.modules.contenidos.model;
+package com.innoad.hardware.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Table(name = "contenido_remoto")
@@ -31,13 +32,13 @@ public class ContenidoRemoto {
     private LocalDateTime fechaActualizacion;
     private String estado;
     private Integer progreso;
-    
+
     @Transient
     private List<Long> dispositivos;
-    
+
     @Transient
-    private java.util.Map<String, Object> programacion;
-    
+    private Map<String, Object> programacion;
+
     public Long getTamaño() {
         return this.tamanio;
     }

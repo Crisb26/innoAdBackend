@@ -1,6 +1,6 @@
 package com.innoad.hardware.repository;
 
-import com.innoad.modules.contenidos.model.ContenidoRemoto;
+import com.innoad.hardware.model.ContenidoRemoto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
