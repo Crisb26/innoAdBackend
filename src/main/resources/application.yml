@@ -22,8 +22,8 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: validate
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
@@ -51,6 +51,12 @@ spring:
   # Configuracion de cache (en memoria, sin Redis)
   cache:
     type: simple
+
+  devtools:
+    restart:
+      enabled: false
+    livereload:
+      enabled: false
 
   # Configuracion de multipart (subida de archivos)
   servlet:
