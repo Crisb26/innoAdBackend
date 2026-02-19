@@ -4,6 +4,12 @@ spring:
   main:
     web-application-type: servlet
 
+  # ===== DESACTIVAR REDIS (NO USADO) =====
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+
   # ===== CONFIGURACION POSTGRESQL DATABASE =====
   datasource:
     url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/innoad_db}
@@ -52,9 +58,11 @@ spring:
   cache:
     type: simple
 
+  # ===== DESACTIVAR DEVTOOLS COMPLETAMENTE =====
   devtools:
     restart:
       enabled: false
+      additional-exclude: static/**,public/**,uploads/**
     livereload:
       enabled: false
 

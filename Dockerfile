@@ -41,8 +41,6 @@ ENV JAVA_OPTS=""
 # Asegurar que Spring use el perfil prod si está definida la variable
 ENV SPRING_PROFILES_ACTIVE=prod
 
-ENV SPRING_MAIN_ALLOW_BEAN_DEFINITION_OVERRIDING=true
-
 
 ENTRYPOINT ["sh","-c","java $JAVA_OPTS -Dspring.profiles.active=${SPRING_PROFILES_ACTIVE:-prod} -jar /app/innoad-backend.jar"]
 
